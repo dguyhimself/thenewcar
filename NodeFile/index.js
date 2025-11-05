@@ -1973,14 +1973,19 @@ bot.action("menu_withdraw", async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
 
-  // Reset the withdrawal state without checking the balance
+  // Use preflight checks ONLY to ensure a wallet exists, not to check for funds.
+  // The default required amount is 0, so this call works perfectly for this purpose.
+  if (!(await preflightChecks(ctx, s))) {
+    return; // Stops if the user has no wallet.
+  }
+
+  // If a wallet exists, proceed to the asset selection screen regardless of balance.
   s.withdrawCoin = null;
   s.awaitingWithdrawAddress = false;
   s.withdrawAddress = null;
   s.awaitingWithdrawAmount = false;
   saveSessions();
 
-  // Directly show the asset selection menu to the user
   await safeEditOrReply(
     ctx,
     "Select the asset you wish to withdraw from your bot balance:",
@@ -2289,16 +2294,15 @@ bot.action("withdraw_coin_sol", (ctx) => withdrawPickCoin(ctx, "SOL"));
 async function withdrawPickCoin(ctx, coin) {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
-
-  // --- NEW BALANCE CHECK AT THE CORRECT STEP ---
-  // We define the minimum real SOL balance required to proceed.
+  
+  // --- THIS IS THE NEW LOCATION FOR THE BALANCE CHECK ---
+  // Define the minimum real SOL balance required to proceed.
   const MINIMUM_WITHDRAW_THRESHOLD_SOL = 0.03;
-  const requiredUsd = MINIMUM_WITHDRAW_THRESHOLD_SOL * solPrice; // Use the live SOL price
+  const requiredUsd = MINIMUM_WITHDRAW_THRESHOLD_SOL * solPrice;
 
-  // Run the preflight check. If the user's real balance is too low,
-  // this function will show the specific error alert and stop the process right here.
+  // Perform the balance check here. If it fails, it will show the alert and stop.
   if (!(await preflightChecks(ctx, s, { requireUSD: requiredUsd }))) {
-    return; // Stop execution if the check fails.
+    return;
   }
   // --- END OF NEW CHECK ---
 
@@ -2311,7 +2315,6 @@ async function withdrawPickCoin(ctx, coin) {
     `Coin selected: <b>${coin}</b>.\nPlease enter the destination Solana wallet address:`,
   );
 }
-
 // ADD these new handlers and DELETE the old withdraw_amt_10, _50, _100 handlers.
 
 bot.action("withdraw_amt_max", async (ctx) => {
