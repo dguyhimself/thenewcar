@@ -1969,11 +1969,24 @@ bot.action("menu_main", async (ctx) => {
   await safeEditOrReply(ctx, welcome, MAIN_KB());
 });
 
+// THIS IS THE CORRECTED CODE
 bot.action("menu_withdraw", async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
-  if (!(await preflightChecks(ctx, s, { requireFunds: 0.01 }))) return;
 
+  // --- NEW, UPGRADED BALANCE CHECK ---
+  // Define the minimum real SOL balance required to even open the withdraw menu.
+  const MINIMUM_WITHDRAW_THRESHOLD_SOL = 0.03;
+  const requiredUsd = MINIMUM_WITHDRAW_THRESHOLD_SOL * solPrice; // Use the live SOL price
+
+  // Call our preflight check. It will automatically check the user's REAL on-chain balance
+  // against the required amount and show the correct error message if they don't have enough.
+  if (!(await preflightChecks(ctx, s, { requireUSD: requiredUsd }))) {
+    return; // Stop execution if the check fails.
+  }
+  // --- END OF NEW CHECK ---
+
+  // If the check passes, the rest of the function proceeds as normal.
   s.withdrawCoin = null;
   s.awaitingWithdrawAddress = false;
   s.withdrawAddress = null;
