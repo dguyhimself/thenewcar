@@ -1,0 +1,20 @@
+{
+  "name": "nodejs-project",
+  "version": "1.0.0",
+  "description": "A basic Node.js project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@solana/web3.js": "^1.91.9",
+    "bs58": "^5.0.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "telegraf": "^4.16.3",
+    "ws": "^8.18.3"
+  }
+}
