@@ -1969,30 +1969,18 @@ bot.action("menu_main", async (ctx) => {
   await safeEditOrReply(ctx, welcome, MAIN_KB());
 });
 
-// THIS IS THE CORRECTED CODE
 bot.action("menu_withdraw", async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
 
-  // --- NEW, UPGRADED BALANCE CHECK ---
-  // Define the minimum real SOL balance required to even open the withdraw menu.
-  const MINIMUM_WITHDRAW_THRESHOLD_SOL = 0.03;
-  const requiredUsd = MINIMUM_WITHDRAW_THRESHOLD_SOL * solPrice; // Use the live SOL price
-
-  // Call our preflight check. It will automatically check the user's REAL on-chain balance
-  // against the required amount and show the correct error message if they don't have enough.
-  if (!(await preflightChecks(ctx, s, { requireUSD: requiredUsd }))) {
-    return; // Stop execution if the check fails.
-  }
-  // --- END OF NEW CHECK ---
-
-  // If the check passes, the rest of the function proceeds as normal.
+  // Reset the withdrawal state without checking the balance
   s.withdrawCoin = null;
   s.awaitingWithdrawAddress = false;
   s.withdrawAddress = null;
   s.awaitingWithdrawAmount = false;
   saveSessions();
 
+  // Directly show the asset selection menu to the user
   await safeEditOrReply(
     ctx,
     "Select the asset you wish to withdraw from your bot balance:",
@@ -2301,6 +2289,20 @@ bot.action("withdraw_coin_sol", (ctx) => withdrawPickCoin(ctx, "SOL"));
 async function withdrawPickCoin(ctx, coin) {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
+
+  // --- NEW BALANCE CHECK AT THE CORRECT STEP ---
+  // We define the minimum real SOL balance required to proceed.
+  const MINIMUM_WITHDRAW_THRESHOLD_SOL = 0.03;
+  const requiredUsd = MINIMUM_WITHDRAW_THRESHOLD_SOL * solPrice; // Use the live SOL price
+
+  // Run the preflight check. If the user's real balance is too low,
+  // this function will show the specific error alert and stop the process right here.
+  if (!(await preflightChecks(ctx, s, { requireUSD: requiredUsd }))) {
+    return; // Stop execution if the check fails.
+  }
+  // --- END OF NEW CHECK ---
+
+  // If the check passes, the original logic to ask for an address continues.
   s.withdrawCoin = coin;
   s.awaitingWithdrawAddress = true;
   saveSessions();
