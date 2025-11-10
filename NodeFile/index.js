@@ -166,29 +166,29 @@ function stopPumpListener() {
   }
 }
 
-// Fetch SOL price from Jupiter API (more reliable for Render)
+// Fetch SOL price from CoinGecko
 async function fetchSolPrice() {
-  // This is the new, simple URL for Jupiter's price API
-  const url = "https://price.jup.ag/v4/price?ids=SOL"; 
+  const url =
+    "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
   try {
     const response = await fetch(url);
     if (!response.ok) {
+      // Handles HTTP errors like 404, 500 etc.
       console.error(
-        `Error fetching SOL price: Jupiter API responded with status ${response.status}`,
+        `Error fetching SOL price: CoinGecko responded with status ${response.status}`,
       );
-      return;
+      return; // Exit the function if the response is not ok
     }
     const parsedData = await response.json();
-    
-    // The data structure is different, so we adjust how we access the price
-    if (parsedData.data && parsedData.data.SOL && parsedData.data.SOL.price) {
-      solPrice = parsedData.data.SOL.price; // Get the price from the new structure
+    if (parsedData.solana && parsedData.solana.usd) {
+      solPrice = parsedData.solana.usd;
       console.log(`Updated SOL Price: $${solPrice}`);
     } else {
-      console.error("Error: Invalid data structure in Jupiter API response.");
+      console.error("Error: Invalid data structure in CoinGecko response.");
     }
   } catch (error) {
-    console.error("Failed to fetch SOL price from Jupiter API:", error.message);
+    // Handles network errors, DNS issues, etc.
+    console.error("Failed to fetch SOL price from CoinGecko:", error.message);
   }
 }
 
@@ -5177,48 +5177,37 @@ process.once("SIGTERM", cleanupAndExit);
 async function startBot() {
   console.log("Initializing bot...");
 
-  // --- NEW: Robust Price Fetching with Retries ---
-  const maxRetries = 3;
-  for (let i = 0; i < maxRetries; i++) {
-    console.log(`Attempting to fetch SOL price (Attempt ${i + 1}/${maxRetries})...`);
-    await fetchSolPrice();
-    if (solPrice > 0) {
-      console.log(`Initial SOL price successfully loaded: $${solPrice}`);
-      break; // Exit the loop if successful
-    }
-    if (i < maxRetries - 1) {
-      console.log("Fetch failed. Retrying in 3 seconds...");
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds before the next try
-    }
-  }
+  // 1. Fetch the initial, critical SOL price and WAIT for it to finish.
+  await fetchSolPrice();
 
+  // --- ADD THESE TWO LINES ---
+  await updateLeaderboardCache(); // Run once on startup
+  setInterval(updateLeaderboardCache, 10 * 60 * 1000); // Update every 10 minutes
+
+  // 2. Add a check to see if the price was successfully fetched.
   if (solPrice === 0) {
     console.warn(
-      "WARNING: Initial SOL price could not be fetched after multiple attempts. The dashboard will show $0 until the next successful update."
+      "WARNING: Initial SOL price could not be fetched. The dashboard will show $0 until the next successful update. Please check API connectivity.",
     );
+  } else {
+    console.log(`Initial SOL price successfully loaded: $${solPrice}`);
   }
-  // --- END of new logic ---
 
-  // The rest of the function continues as normal
-  await updateLeaderboardCache();
-  setInterval(updateLeaderboardCache, 10 * 60 * 1000);
-
-  // Set up the recurring price update regardless of initial success
+  // 3. Set up the recurring price update and WebSocket connection.
   setInterval(fetchSolPrice, 5 * 60 * 1000);
 
-  // NOW that the initial data is loaded, launch the bot
+  // 4. NOW that the initial data is loaded, launch the bot.
   try {
     await bot.launch();
     console.log("✅ SniperX Bot is now online and ready!");
-  } catch (err)
-  {
+  } catch (err) {
     console.error("❌ Bot launch failed:", err);
   }
 }
 
-// Launch the bot with the new robust startup sequence
+// THIS IS THE CORRECTED CODE
 startBot()
   .then(() => {
-    console.log("Telegram sniper mock launched with robust price fetching.");
+    console.log("Telegram sniper mock launched (Wallet Manager Update)");
   })
   .catch((err) => console.error("Bot launch failed:", err));
