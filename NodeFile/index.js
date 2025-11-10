@@ -188,8 +188,15 @@ async function fetchSolPrice() {
     }
   } catch (error) {
     // Handles network errors, DNS issues, etc.
-    console.error("Failed to fetch SOL price from CoinGecko:", error.message);
-  }
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    console.error("!!! CRITICAL: API CONNECTION FAILED !!!");
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    console.error("Failed to fetch SOL price from CoinGecko. Full error details:");
+    console.error("Error Name:", error.name);
+    console.error("Error Message:", error.message);
+    console.error("Error Cause:", error.cause); // This is very helpful!
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+}
 }
 
 /* ---------- Persistence ---------- */
