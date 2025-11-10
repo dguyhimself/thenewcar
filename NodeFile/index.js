@@ -5177,37 +5177,48 @@ process.once("SIGTERM", cleanupAndExit);
 async function startBot() {
   console.log("Initializing bot...");
 
-  // 1. Fetch the initial, critical SOL price and WAIT for it to finish.
-  await fetchSolPrice();
-
-  // --- ADD THESE TWO LINES ---
-  await updateLeaderboardCache(); // Run once on startup
-  setInterval(updateLeaderboardCache, 10 * 60 * 1000); // Update every 10 minutes
-
-  // 2. Add a check to see if the price was successfully fetched.
-  if (solPrice === 0) {
-    console.warn(
-      "WARNING: Initial SOL price could not be fetched. The dashboard will show $0 until the next successful update. Please check API connectivity.",
-    );
-  } else {
-    console.log(`Initial SOL price successfully loaded: $${solPrice}`);
+  // --- NEW: Robust Price Fetching with Retries ---
+  const maxRetries = 3;
+  for (let i = 0; i < maxRetries; i++) {
+    console.log(`Attempting to fetch SOL price (Attempt ${i + 1}/${maxRetries})...`);
+    await fetchSolPrice();
+    if (solPrice > 0) {
+      console.log(`Initial SOL price successfully loaded: $${solPrice}`);
+      break; // Exit the loop if successful
+    }
+    if (i < maxRetries - 1) {
+      console.log("Fetch failed. Retrying in 3 seconds...");
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds before the next try
+    }
   }
 
-  // 3. Set up the recurring price update and WebSocket connection.
+  if (solPrice === 0) {
+    console.warn(
+      "WARNING: Initial SOL price could not be fetched after multiple attempts. The dashboard will show $0 until the next successful update."
+    );
+  }
+  // --- END of new logic ---
+
+  // The rest of the function continues as normal
+  await updateLeaderboardCache();
+  setInterval(updateLeaderboardCache, 10 * 60 * 1000);
+
+  // Set up the recurring price update regardless of initial success
   setInterval(fetchSolPrice, 5 * 60 * 1000);
 
-  // 4. NOW that the initial data is loaded, launch the bot.
+  // NOW that the initial data is loaded, launch the bot
   try {
     await bot.launch();
     console.log("✅ SniperX Bot is now online and ready!");
-  } catch (err) {
+  } catch (err)
+  {
     console.error("❌ Bot launch failed:", err);
   }
 }
 
-// THIS IS THE CORRECTED CODE
+// Launch the bot with the new robust startup sequence
 startBot()
   .then(() => {
-    console.log("Telegram sniper mock launched (Wallet Manager Update)");
+    console.log("Telegram sniper mock launched with robust price fetching.");
   })
   .catch((err) => console.error("Bot launch failed:", err));
