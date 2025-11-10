@@ -1026,7 +1026,7 @@ function SOLANA_COIN_KB(actionPrefix) {
 function DEPOSIT_FUNDS_KB(hasWallets) {
   const buttons = [
     [
-      Markup.button.callback("2�� Create New Wallet", "deposit_new_wallet"),
+      Markup.button.callback("➕ Create New Wallet", "deposit_new_wallet"),
       Markup.button.callback("📥 Import Wallet", "deposit_import_wallet"),
     ],
   ];
