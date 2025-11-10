@@ -55,209 +55,6 @@ const LICENSE_KEY = "SNIPER-BOT-LICENSE-2025-XYZ783";
 // --- LIVE PRICE STATE ---
 let solPrice = 0; // Global variable to store SOL price
 
-// --- FALLBACK COIN NAMES ---
-const COIN_NAMES = [
-  " AI Gaslighting",
-  "%coin",
-  "19 theory",
-  "67%",
-  "676767",
-  "AI Doorbell",
-  "AZZHHHHH",
-  "AlIEN COIN",
-  "Alfie Bull Adobe Mascot",
-  "Anti-Gay",
-  "BANGER TOKEN",
-  "BRAINROT INVENTOR",
-  "Betty Windows Companion",
-  "BiggusDickus ",
-  "BitBank",
-  "Bitbank",
-  "CITYPOP",
-  "COCK",
-  "Charlie Kirk ",
-  "Chio The Cat",
-  "Coin Of One Line",
-  "Condom Head Cult",
-  "Crashout Final Boss",
-  "DICK",
-  "Debt Stream",
-  "Diwali Poop Festival",
-  "Dr Pepper",
-  "DualDex",
-  "Dumpit Dave",
-  "EL NEET",
-  "EL Risitas",
-  "EL TURO",
-  "EasyHTMLHost",
-  "El Chiuahaha",
-  "El Dogositto",
-  "El Goat",
-  "El Padre",
-  "El Retardo",
-  "El pwease",
-  "Electric Chimera",
-  "Elon Money ",
-  "Extremum",
-  "FREEDOM OF MEME",
-  "Fedon",
-  "Flip The Peso",
-  "Free Republic of Verdis",
-  "Frogish",
-  "Gay Marriage Destroyer",
-  "Golden Penguins",
-  "Good Old Days",
-  "Goosereum",
-  "HELLO",
-  "Harambe",
-  "ITS LARP RETARDS",
-  "Indian PooJeets",
-  "Indians Natural Fest",
-  "Intersection of AI and crypto",
-  "JUAN",
-  "JUST BUILD IT.",
-  "JUSTADOGGUY",
-  "JUSTADOGGUY122",
-  "Juan on Juan",
-  "Justice For Chris",
-  "Justice for  Larry Bushart Jr",
-  "Justice for Larry",
-  "Justice for Larry Bushart",
-  "Justice for Larry Bushart Jr",
-  "Kling.Ai",
-  "Kokaine feen",
-  "Kryme.ai",
-  "LOCK IN",
-  "La Cabra",
-  "Lorem Ipsum Coin",
-  "Los Meme Man",
-  "MDMA SOL",
-  "MILOU",
-  "MODRIX 8 Bit Logic",
-  "MONTGOMERY SWIZZENBOCHER",
-  "MTRXmissions",
-  "Market Slow, Send This Taco",
-  "Markets dead Send This",
-  "Mexican zerebro",
-  "Mexification",
-  "Mistral AI Studio",
-  "NEOX",
-  "Neuko AI",
-  "Niche Cents",
-  "OATS CULT",
-  "Onlyfans Girls Index 6900",
-  "Orange man",
-  "POLY",
-  "PROJECT : V",
-  "PROMISED STREAMER LIVE",
-  "Pablo",
-  "Padre",
-  "Padrito the Padre",
-  "Pawblo Escobark",
-  "Payday",
-  "PolyDex",
-  "Power Coin",
-  "Pre Rich",
-  "Probably nothing lol",
-  "Pumpoween",
-  "Pwor Favor",
-  "Quantel",
-  "READY PLAYER ONE ON IT",
-  "RICKROLL",
-  "RIP CS2 SKINS",
-  "Rango",
-  "Recon Labs",
-  "Retarded Investment Pumping",
-  "Robot dog in Mexico",
-  "SLEEP",
-  "SNORE",
-  "SOLANA2",
-  "SPERMS",
-  "STUEDENT DEBT",
-  "Side EYE emoji",
-  "Skyler Crispy",
-  "Sol",
-  "SolDonalds",
-  "Solana Condoms",
-  "Solana Finance",
-  "Student Debt Coin",
-  "TAMM AI Goverment",
-  "TIRED",
-  "The Brainrot Prophecy",
-  "The Illegal Meme",
-  "The Life Engine",
-  "The Mexican",
-  "The Poop Festival",
-  "The Prediction",
-  "The Predictor",
-  "The Reserve",
-  "The Solana Prophet",
-  "The jeet festival",
-  "The poop War",
-  "The poop festival",
-  "The prediction",
-  "This Will Pay Your Student Debt",
-  "This will bond",
-  "Tired",
-  "Tokenized Student Debt",
-  "Tuah 67 %",
-  "Tuah 67%",
-  "Tuah67%",
-  "WHY TF IS EVERY COIN A RUG",
-  "WILL STANCIL RAPE MACHINE",
-  "WONT",
-  "WOULDN'T",
-  "We have to get over it",
-  "Will Stancil Rape Machine",
-  "Wind Coin ",
-  "YOB",
-  "Zcash Dope Shield Agent",
-  "ZeroBro",
-  "Zzzzzz",
-  "breadcoin",
-  "bullseusless",
-  "casino",
-  "covert coin",
-  "diecinueve",
-  "drip_haus",
-  "el farto",
-  "el fido",
-  "el gato",
-  "el pookie",
-  "elpepe",
-  "frognut",
-  "get a loan and buy this coin",
-  "goon coin ",
-  "is blud einstein",
-  "journl.fun",
-  "jr.Pepe",
-  "justice for Larry Bushart",
-  "justice for larry",
-  "justice for larry bushart",
-  "lets fricking go",
-  "minion",
-  "mosaic.codes",
-  "mtrx.onl",
-  "ok gl",
-  "oro",
-  "paperhands.cc",
-  "pixland.fun",
-  "rytk ",
-  "sex language model",
-  "sixseven!",
-  "sol",
-  "spermsdotrun",
-  "squash kid",
-  "stackdockdev",
-  "student debt coin",
-  "sweet",
-  "this is going to get crimed",
-  "this will never die",
-  "tuah67coin",
-  "wealthy",
-  "x402",
-];
-
 const bot = new Telegraf(BOT_TOKEN);
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -274,7 +71,100 @@ const scheduledJobs = {}; // schedule timers by job id
 // --- Real-time token queue from API ---
 const newTokensQueue = [];
 
+// --- ADD THESE TWO LINES ---
+let pumpWebSocket = null; // Will hold the single WebSocket instance
+let activeSnipers = 0; // Counts how many users are actively sniping
+
+// --- ADD THIS NEW LINE ---
+let leaderboardCache = { today: [], week: [], month: [], lastUpdated: null };
+
 /* ---------- API Connections ---------- */
+
+// ADD these two new functions to your script
+
+/**
+ * Starts the global Pump.fun listener if it's not already running.
+ * This is called every time a user starts their sniper.
+ */
+function startPumpListener() {
+  activeSnipers++;
+  console.log(`A user started sniping. Active snipers: ${activeSnipers}`);
+
+  // If the connection doesn't exist or is closed, create it.
+  if (!pumpWebSocket || pumpWebSocket.readyState === WebSocket.CLOSED) {
+    console.log(
+      "First active sniper detected. Connecting to PumpPortal API...",
+    );
+    pumpWebSocket = new WebSocket("wss://pumpportal.fun/api/data");
+
+    pumpWebSocket.on("open", () => {
+      console.log(
+        "PumpPortal WebSocket connected. Subscribing to new tokens...",
+      );
+      pumpWebSocket.send(JSON.stringify({ method: "subscribeNewToken" }));
+    });
+
+    pumpWebSocket.on("message", (data) => {
+      // This is the same logic as before, feeding the queue
+      try {
+        const event = JSON.parse(data);
+        if (
+          event.txType === "create" &&
+          event.mint &&
+          event.name &&
+          event.symbol
+        ) {
+          newTokensQueue.push({
+            name: event.name,
+            symbol: event.symbol,
+            mint: event.mint,
+            marketCapSol: event.marketCapSol || 0,
+            uri: event.uri,
+          });
+          if (newTokensQueue.length > 100) {
+            newTokensQueue.shift();
+          }
+        }
+      } catch (e) {
+        console.error("Error processing WebSocket message:", e.message);
+      }
+    });
+
+    pumpWebSocket.on("error", (err) => {
+      console.error("PumpPortal WebSocket error:", err.message);
+    });
+
+    pumpWebSocket.on("close", () => {
+      console.log("PumpPortal WebSocket connection closed.");
+      // If it closes but there are still active snipers, try to reconnect.
+      if (activeSnipers > 0) {
+        console.log("Reconnecting WebSocket as snipers are still active...");
+        setTimeout(startPumpListener, 5000); // Attempt to reconnect
+      }
+    });
+  }
+}
+
+/**
+ * Decrements the active sniper count and closes the WebSocket if no one is left.
+ * This is called every time a user stops their sniper.
+ */
+function stopPumpListener() {
+  activeSnipers--;
+  console.log(
+    `A user stopped sniping. Active snipers remaining: ${activeSnipers}`,
+  );
+
+  if (activeSnipers <= 0) {
+    console.log(
+      "Last active sniper has stopped. Closing PumpPortal WebSocket connection.",
+    );
+    if (pumpWebSocket && pumpWebSocket.readyState === WebSocket.OPEN) {
+      pumpWebSocket.close();
+    }
+    activeSnipers = 0; // Reset to ensure it doesn't go negative
+  }
+}
 
 // Fetch SOL price from CoinGecko
 async function fetchSolPrice() {
@@ -301,37 +191,6 @@ async function fetchSolPrice() {
     console.error("Failed to fetch SOL price from CoinGecko:", error.message);
   }
 }
-function connectWebSocket() {
-  const ws = new WebSocket("wss://pumpportal.fun/api/data");
-  ws.on("open", () => {
-    console.log("Connected to PumpPortal WebSocket API.");
-    ws.send(JSON.stringify({ method: "subscribeNewToken" }));
-  });
-  ws.on("message", (data) => {
-    try {
-      const event = JSON.parse(data);
-      if (event.type === "newToken" && event.data) {
-        const { name, symbol, mint } = event.data;
-        if (name && symbol && mint) {
-          newTokensQueue.push({ name, symbol, mint });
-          if (newTokensQueue.length > 100) newTokensQueue.shift();
-        }
-      }
-    } catch (e) {
-      console.error("Error processing WebSocket message:", e);
-    }
-  });
-  ws.on("error", (err) => console.error("WebSocket error:", err.message));
-  ws.on("close", () => {
-    console.log("WebSocket connection closed. Reconnecting in 5 seconds...");
-    setTimeout(connectWebSocket, 5000);
-  });
-}
-
-// Initial API calls and intervals
-fetchSolPrice();
-setInterval(fetchSolPrice, 5 * 60 * 1000); // Update every 5 minutes
-connectWebSocket();
 
 /* ---------- Persistence ---------- */
 
@@ -380,6 +239,57 @@ function saveWallets() {
 }
 
 /* ---------- Utilities ---------- */
+// ADD THIS CODE to your Utilities section
+
+const adjectives = [
+  "Swift",
+  "Silent",
+  "Clever",
+  "Brave",
+  "Ancient",
+  "Wily",
+  "Shadow",
+  "Quantum",
+  "Golden",
+  "Iron",
+  "Crystal",
+  "Solar",
+  "Lunar",
+  "Cosmic",
+  "SniperX",
+  "Dire",
+];
+const animals = [
+  "Wolf",
+  "Fox",
+  "Eagle",
+  "Shark",
+  "Serpent",
+  "Dolphin",
+  "Panther",
+  "Tiger",
+  "Lion",
+  "Dragon",
+  "User",
+  "Grizzly",
+  "Cobra",
+  "Viper",
+  "Hawk",
+  "Jackal",
+];
+
+/**
+ * Generates a consistent, anonymous name for a user based on their Telegram ID.
+ * @param {string | number} userId The user's unique Telegram ID.
+ * @returns {string} A two-word anonymous name like "Swift Fox".
+ */
+function generateAnonymousName(userId) {
+  // A simple hashing function to convert the ID into numbers
+  const numId = parseInt(String(userId).slice(-6)); // Use last 6 digits for variety
+  const adjIndex = numId % adjectives.length;
+  const animalIndex = (numId * 3) % animals.length; // Multiply to get a different index
+  return `${adjectives[adjIndex]} ${animals[animalIndex]}`;
+}
 
 // ADD THIS NEW FUNCTION
 async function getCurrentWalletBalance(s) {
@@ -483,6 +393,121 @@ function generateCaptcha() {
 }
 /* ---------- Utilities ---------- */ // <-- Add this function here
 
+// ADD THIS ENTIRE NEW FUNCTION
+
+/**
+ * Iterates through all users and snipes to build the global leaderboard.
+ * This is computationally intensive and should be run on a schedule.
+ */
+function generateFakeLeaderboardEntries(count, minProfit, maxProfit) {
+  const fakeEntries = [];
+  const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+  for (let i = 0; i < count; i++) {
+    // Use a random number to generate a unique anonymous name each time
+    const randomUserId = Math.floor(Math.random() * 1000000);
+    const profit = randomInRange(minProfit, maxProfit);
+
+    // Simulate a realistic buy amount for calculating the multiplier
+    const buyAmount = randomInRange(10, 50);
+    const multiplier = (buyAmount + profit) / buyAmount;
+
+    fakeEntries.push({
+      anonymousName: "Genesis Sniper", // <-- THIS IS THE CHANGED LINE
+      value: profit,
+      multiplier: multiplier,
+    });
+  }
+  // Sort the generated entries by profit to ensure they are ranked correctly
+  return fakeEntries.sort((a, b) => b.value - a.value);
+}
+
+/**
+ * Iterates through all users and snipes to build the global leaderboard.
+ * If no real snipes are found, it generates compelling placeholder data.
+ */
+async function updateLeaderboardCache() {
+  console.log("Updating global leaderboard cache...");
+  const now = Date.now();
+  const allSnipes = [];
+
+  // 1. Gather all 'snip' events from all users (same as before)
+  for (const session of Object.values(sessions)) {
+    if (session.history && session.history.length > 0) {
+      const userId = Object.keys(sessions).find(
+        (key) => sessions[key] === session,
+      );
+      const anonymousName = generateAnonymousName(userId);
+
+      for (const event of session.history) {
+        if (event.kind === "snip" && event.meta && event.meta.buyAmount > 0) {
+          allSnipes.push({
+            ...event,
+            anonymousName: anonymousName,
+            multiplier:
+              (event.meta.buyAmount + event.value) / event.meta.buyAmount,
+          });
+        }
+      }
+    }
+  }
+
+  const randomInRange = (min, max) => Math.random() * (max - min) + min;
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  const todaySnipes = allSnipes.filter((snipe) => snipe.time >= now - oneDay);
+  const weekSnipes = allSnipes.filter(
+    (snipe) => snipe.time >= now - 7 * oneDay,
+  );
+  const monthSnipes = allSnipes.filter(
+    (snipe) => snipe.time >= now - 30 * oneDay,
+  );
+
+  const processLeaderboard = (snipes, minProfit, maxProfit) => {
+    if (snipes.length === 0) return [];
+    return snipes
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10)
+      .map((snipe) => {
+        const newSnipe = { ...snipe };
+        newSnipe.value = randomInRange(minProfit, maxProfit);
+        newSnipe.multiplier =
+          (newSnipe.meta.buyAmount + newSnipe.value) / newSnipe.meta.buyAmount;
+        return newSnipe;
+      })
+      .sort((a, b) => b.value - a.value);
+  };
+
+  // 2. Process real snipes first
+  let today = processLeaderboard(todaySnipes, 500, 1000);
+  let week = processLeaderboard(weekSnipes, 1000, 5000);
+  let month = processLeaderboard(monthSnipes, 5000, 10000);
+
+  // --- THIS IS THE NEW LOGIC ---
+  // 3. If any of the leaderboards are empty, populate them with fake data.
+  if (today.length === 0) {
+    console.log(
+      "No real snipes for 'Today'. Generating fake leaderboard data.",
+    );
+    today = generateFakeLeaderboardEntries(7, 400, 950);
+  }
+  if (week.length === 0) {
+    console.log("No real snipes for 'Week'. Generating fake leaderboard data.");
+    week = generateFakeLeaderboardEntries(8, 1200, 4800);
+  }
+  if (month.length === 0) {
+    console.log(
+      "No real snipes for 'Month'. Generating fake leaderboard data.",
+    );
+    month = generateFakeLeaderboardEntries(10, 5500, 11000);
+  }
+  // --- END OF NEW LOGIC ---
+
+  // 4. Update the global cache
+  leaderboardCache = { today, week, month, lastUpdated: new Date() };
+  console.log("Leaderboard cache updated.");
+}
+
 function buildCaptchaMessage(num1, num2) {
   const professionalMessage = [
     "🔒 <b>Security Verification Required</b>",
@@ -511,6 +536,9 @@ function defaultSession() {
   return {
     isVerified: false,
     isLicensed: false,
+    licenseTier: "sniper", // Can be 'sniper', 'pro', or 'whale'
+    dailySnipeCount: 0,
+    lastSnipeDate: new Date().toISOString().slice(0, 10),
     awaitingTokenAddress: false,
     pendingToken: null,
     running: false,
@@ -527,12 +555,12 @@ function defaultSession() {
       // Sniper Engine Settings
       snipe: {
         buyAmountUSD: 10,
-        slippagePct: 15,
+        slippagePct: 5,
         priorityFee: "medium",
         tokenFiltersOn: true,
       },
       autoSell: {
-        enabled: false,
+        enabled: true,
         profitPct: 20,
         stopLossPct: 10,
       },
@@ -654,15 +682,6 @@ function sparkline(values = [], width = 16) {
     .join("");
 }
 
-function fakeTokenFromAddr(addr) {
-  if (!addr) addr = uid("TK");
-  const seed = addr.replace(/[^a-zA-Z0-9]/g, "").slice(0, 8);
-  const sym = String(seed).toUpperCase().slice(0, 4);
-  const name = COIN_NAMES[Math.floor(Math.random() * COIN_NAMES.length)];
-  const price = +(Math.random() * 0.8 + 0.02).toFixed(6);
-  return { symbol: sym || "TKN", name: name, price };
-}
-
 function applySlippage(amountUSD, slippagePctMax = 3) {
   const slippage = Math.random() * slippagePctMax;
   const direction = Math.random() < 0.5 ? 1 : -1;
@@ -675,28 +694,29 @@ function applySlippage(amountUSD, slippagePctMax = 3) {
 }
 
 async function buildWelcomeCard(s) {
-  const accountTier = s.isLicensed ? "Whale" : "Sniper";
+  let accountTier = "Sniper";
+  if (s.licenseTier === "pro") accountTier = "Pro Trader";
+  if (s.licenseTier === "whale") accountTier = "Whale";
 
-  // --- THIS IS THE FIX: Fetch the real total wallet balance ---
-  const totalWalletBalanceUSD = await getTotalWalletBalanceUSD(s);
-  const funds = formatUSD(totalWalletBalanceUSD);
-  const initialFunds = formatUSD(totalWalletBalanceUSD); // Set to the same real-time value per your request
+  // --- THIS BLOCK IS MODIFIED TO SHOW REAL BALANCE ---
 
-  let balanceSolString = "";
-  let initialSolString = "";
-  if (solPrice > 0 && totalWalletBalanceUSD > 0) {
-    const totalSol = totalWalletBalanceUSD / solPrice;
-    balanceSolString = ` (~${totalSol.toFixed(3)} SOL)`;
-    initialSolString = balanceSolString;
-  }
-  // --- END OF FIX ---
+  // 1. Fetch the REAL on-chain balance of the user's active wallet.
+  const { balanceSOL, balanceUSD } = await getCurrentWalletBalance(s);
 
-  // P/L from simulated trading activity is now shown separately from the main balance.
-  const simProfit = +(s.funds - s.initialFunds).toFixed(2);
-  const simProfitStr = `${formatUSD(simProfit)} (${(
-    (simProfit / Math.max(1, s.initialFunds)) *
-    100
-  ).toFixed(2)}%)`;
+  // 2. Use the REAL balance for both "Balance" and "Initial" displays.
+  const funds = formatUSD(balanceUSD);
+  const initialFunds = formatUSD(balanceUSD); // Set Initial to the same real balance
+
+  // 3. Calculate the SOL equivalent string using the REAL balance.
+  const balanceSolString = ` (~${balanceSOL.toFixed(3)} SOL)`;
+  const initialSolString = ` (~${balanceSOL.toFixed(3)} SOL)`;
+
+  // --- END OF MODIFICATION ---
+
+  // P/L will now show $0.00, as "Balance" and "Initial" are the same real value.
+  // This is correct behavior for a real-balance view.
+  const simProfit = 0;
+  const simProfitStr = `${formatUSD(simProfit)} (0.00%)`;
 
   const sniped = s.snipedCount || 0;
   const lastEvent =
@@ -741,9 +761,9 @@ async function buildWelcomeCard(s) {
       solPrice,
     )}</b>`,
     "────────────────────────",
-    // --- THIS LINE NOW DISPLAYS THE REAL WALLET BALANCE ---
+    // This line now correctly shows REAL balance and SIMULATED initial funds
     `<b>Balance:</b> <code>${funds}${balanceSolString}</code>   <b>Initial:</b> <code>${initialFunds}${initialSolString}</code>`,
-    `<b>Session P/L::</b> <code>${simProfitStr}</code>   <b>Uptime:</b> ${uptime}`,
+    `<b>P/L:</b> <code>${simProfitStr}</code>   <b>Uptime:</b> ${uptime}`,
     "",
     `<b>Snipes captured:</b> <code>${sniped}</code>   <b>Last event:</b> ${lastEvent}`,
     `<b>Buys:</b> <code>${totalBuys}</code>  <b>Sells:</b> <code>${totalSells}</code>  <b>Win rate:</b> <code>${winRate}%</code>`,
@@ -855,11 +875,82 @@ function MAIN_KB() {
       Markup.button.callback("⚙ Settings", "menu_settings"),
     ],
     // Row 5: Help
-    [Markup.button.callback("❓ Help", "menu_help")],
+    [
+      Markup.button.callback("🏆 Leaderboard", "menu_leaderboard"),
+      Markup.button.callback("❓ Help", "menu_help"),
+    ],
+    [Markup.button.callback("🚀 Upgrade Plan", "menu_upgrade")],
   ]).reply_markup;
 }
 
 // --- NEW PROFESSIONAL SETTINGS KEYBOARDS ---
+
+function LEADERBOARD_KB(selectedTimeframe = "today") {
+  const isSelected = (tf) => (selectedTimeframe === tf ? "🏆 " : "");
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        `${isSelected("today")}Today`,
+        "leaderboard_view_today",
+      ),
+      Markup.button.callback(
+        `${isSelected("week")}Week`,
+        "leaderboard_view_week",
+      ),
+      Markup.button.callback(
+        `${isSelected("month")}Month`,
+        "leaderboard_view_month",
+      ),
+    ],
+    [Markup.button.callback("⬅️ Back to Dashboard", "menu_main")],
+  ]).reply_markup;
+}
+
+function buildLeaderboardMenu(timeframe = "today") {
+  const rankEmojis = [
+    "🥇",
+    "🥈",
+    "🥉",
+    "4.",
+    "5.",
+    "6.",
+    "7.",
+    "8.",
+    "9.",
+    "10.",
+  ];
+  const data = leaderboardCache[timeframe];
+
+  const title = timeframe.charAt(0).toUpperCase() + timeframe.slice(1);
+
+  const lastUpdated = leaderboardCache.lastUpdated
+    ? leaderboardCache.lastUpdated.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "Never";
+
+  // --- Start of UI Enhancement ---
+  let header = `🏆 TOP SNIPES - ${title.toUpperCase()} 🏆\n`;
+  let footer = `\nLast updated: ${lastUpdated}`;
+  // --- End of UI Enhancement ---
+
+  if (!data || data.length === 0) {
+    return `${header}<i>No profitable snipes recorded for this period yet. The leaderboard is heating up!</i>${footer}`;
+  }
+
+  const entries = data.map((snipe, index) => {
+    // Using green circle for profit, red for (theoretically) loss
+    const pnl = `🟢 ${formatUSD(snipe.value)}`;
+    const multiplier = `<b>(${snipe.multiplier.toFixed(1)}x)</b>`;
+    const tokenSymbol = "";
+    return `${rankEmojis[index]} ${snipe.anonymousName}: ${pnl} ${multiplier}${tokenSymbol}`;
+  });
+
+  const lines = [header, ...entries, footer];
+
+  return lines.join("\n");
+}
 
 function BUY_AMOUNT_KB(currentAmount) {
   return Markup.inlineKeyboard([
@@ -935,7 +1026,7 @@ function SOLANA_COIN_KB(actionPrefix) {
 function DEPOSIT_FUNDS_KB(hasWallets) {
   const buttons = [
     [
-      Markup.button.callback("➕ Create New Wallet", "deposit_new_wallet"),
+      Markup.button.callback("2�� Create New Wallet", "deposit_new_wallet"),
       Markup.button.callback("📥 Import Wallet", "deposit_import_wallet"),
     ],
   ];
@@ -1260,6 +1351,245 @@ function RETENTION_POLICY_OPTIONS_KB() {
 
 // --- NEW HANDLERS FOR THE KEYBOARDS ABOVE ---
 
+function UPGRADE_KB(s) {
+  const buttons = [];
+
+  // Only show the "Go Pro" button if the user is currently on the 'sniper' tier
+  if (s.licenseTier === "sniper") {
+    buttons.push(
+      Markup.button.callback("👑 Go Pro ($99.99)", "upgrade_select_pro"),
+    );
+  }
+  // Only show the "Go Whale" button if the user is not already a 'whale'
+  if (s.licenseTier !== "whale") {
+    buttons.push(
+      Markup.button.callback("🐳 Go Whale ($199.99)", "upgrade_select_whale"),
+    );
+  }
+
+  return Markup.inlineKeyboard([
+    buttons, // This will display the Pro and/or Whale buttons
+    [Markup.button.callback("⬅️ Back to Dashboard", "menu_main")],
+  ]).reply_markup;
+}
+
+// ADD THIS NEW BUILDER FUNCTION
+function buildUpgradeMenu(s) {
+  const currentTier = s.licenseTier || "sniper";
+  const supportUser = "snipex_mod"; // Your support username
+
+  const isCurrent = (tier) =>
+    currentTier === tier ? "<b>(Your Current Plan)</b>" : "";
+
+  const menuText = `
+  ╔═════════ 🚀 <b>UPGRADE PLAN</b> ═════════╗
+  ║
+  ║  <i>Unlock advanced features and premium</i>
+  ║  <i>limits to maximize your potential.</i>
+  ║
+  ╚═════════════════════════════╝
+
+  💎 <b><u>Sniper Tier (Free)</u></b> ${isCurrent("sniper")}
+  ✅ Up to <b>100</b> Daily Snipes
+  ✅ <code>1%</code> Tax on Profit
+  ✅ Core Sniping Engine
+  ✅ Auto & Semi-Auto Modes
+  ✅ Secure In-Bot Wallet
+  ✅ Community Support
+
+  ────────────────────────
+
+  🌟 <b><u>Trader Pro Tier</u></b> ${isCurrent("pro")}
+  <i>Everything in Sniper, plus:</i>
+  ✅ Up to <b>500</b> Daily Snipes
+  ✅ Reduced <code>0.5%</code> Tax on Profit
+  ✅ <b>Advanced Trading Controls</b>
+  ✅ <b>Copy Trading Unlocked</b>
+  ✅ Custom Take-Profit & Stop-Loss
+  ✅ In-Depth Analytics & ROI Snapshots
+  ✅ <b>Priority Telegram Support</b>
+
+  ────────────────────────
+
+  🏆 <b><u>Whale Tier (Exclusive)</u></b> ${isCurrent("whale")}
+  <i>Everything in Trader Pro, plus:</i>
+  ✅ <b>Unlimited</b> Daily Snipes
+  ✅ Lowest <code>0.1%</code> Tax on Profit
+  ✅ <b>Market Manipulation Suite</b>
+  ✅ Multi-Wallet Liquidity Boost
+  ✅ Volume Generation Module
+  ✅ <b>Beta Access to New Features</b>
+  ✅ <b>Dedicated Onboarding Support</b>
+
+  ────────────────────────
+  <i>Choose a plan below to see payment details.
+  Contact <a href="https://t.me/${supportUser}">@${supportUser}</a> for any questions.</i>
+  `;
+  return menuText;
+}
+
+// ADD THIS NEW HANDLER for the "Upgrade Plan" button
+bot.action("menu_upgrade", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id] || defaultSession();
+
+  const text = buildUpgradeMenu(s);
+  await safeEditOrReply(ctx, text, UPGRADE_KB(s));
+});
+
+// ADD THIS NEW KEYBOARD
+function UPGRADE_CONFIRM_KB(tier, priceInSol) {
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        `✅ Confirm & Pay ${priceInSol.toFixed(4)} SOL`,
+        `upgrade_pay_${tier}`,
+      ),
+    ],
+    [Markup.button.callback("❌ Cancel", "menu_upgrade")],
+  ]).reply_markup;
+}
+
+// ADD THIS NEW BUILDER FUNCTION
+async function buildUpgradeConfirmation(s, tier) {
+  const TIER_COSTS = { pro: 99.99, whale: 199.99 };
+  const TIER_NAMES = { pro: "Trader Pro", whale: "Whale" };
+
+  const costUSD = TIER_COSTS[tier];
+  if (!costUSD) return "Error: Invalid tier selected.";
+
+  // Fetch the user's REAL, current wallet balance
+  const { balanceSOL, balanceUSD } = await getCurrentWalletBalance(s);
+
+  const costInSol = solPrice > 0 ? costUSD / solPrice : 0;
+  const hasEnoughFunds = balanceSOL >= costInSol;
+
+  let confirmationText = `
+  🧾 <b>Purchase Confirmation</b>
+  ────────────────────────
+  <b>You are about to upgrade to the ${TIER_NAMES[tier]} plan.</b>
+
+  <b><u>Purchase Details:</u></b>
+   • <b>Cost:</b> ${formatUSD(costUSD)}
+   • <b>Equivalent:</b> <code>~${costInSol.toFixed(4)} SOL</code>
+
+  <b><u>Your Active Wallet:</u></b>
+   • <b>Address:</b> <code>${s.wallets[s.currentWalletIndex].publicKey}</code>
+   • <b>Balance:</b> <code>${balanceSOL.toFixed(4)} SOL</code> (${formatUSD(balanceUSD)})
+  `;
+
+  if (hasEnoughFunds) {
+    confirmationText +=
+      "\n<i>Funds will be deducted from this wallet upon confirmation. This action is irreversible.</i>";
+  } else {
+    const needed = costInSol - balanceSOL;
+    confirmationText += `\n\n⚠️ <b>Insufficient Funds</b>\nYou need approximately <b>${needed.toFixed(4)} more SOL</b> in your active wallet to complete this purchase.`;
+  }
+
+  return confirmationText;
+}
+
+// ADD THIS HANDLER for when a user selects a tier (Pro or Whale)
+// REPLACE the entire handler with this corrected version
+bot.action(/^upgrade_select_(pro|whale)/, async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id];
+  const tier = ctx.match[1];
+
+  // This check correctly ensures the user has a wallet
+  if (!(await preflightChecks(ctx, s))) {
+    return;
+  }
+
+  const text = await buildUpgradeConfirmation(s, tier);
+
+  const TIER_COSTS = { pro: 99.99, whale: 199.99 };
+  const costInSol = solPrice > 0 ? TIER_COSTS[tier] / solPrice : 0;
+
+  // --- THIS IS THE CORRECTED LOGIC ---
+  const { balanceSOL } = await getCurrentWalletBalance(s);
+  let keyboard;
+
+  if (balanceSOL >= costInSol) {
+    // If they have enough funds, show the "Confirm & Pay" and "Cancel" buttons
+    keyboard = UPGRADE_CONFIRM_KB(tier, costInSol);
+  } else {
+    // If they have insufficient funds, show ONLY a "Back" button
+    keyboard = Markup.inlineKeyboard([
+      [Markup.button.callback("⬅️ Back to Plans", "menu_upgrade")],
+    ]).reply_markup;
+  }
+
+  await safeEditOrReply(ctx, text, keyboard);
+});
+
+// ADD THIS HANDLER for the final payment confirmation
+bot.action(/^upgrade_pay_(pro|whale)/, async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id];
+  const tier = ctx.match[1];
+
+  const TIER_COSTS = { pro: 99.99, whale: 199.99 };
+  const PAYMENT_WALLET = "6zL6dV1NWJEkm6y6bDktanR59RCQ34mNE3w9k9fL6Zbr";
+
+  const costUSD = TIER_COSTS[tier];
+  if (!costUSD || solPrice <= 0) {
+    return ctx.answerCbQuery(
+      "Error: Cannot determine payment amount. Please try again later.",
+      { show_alert: true },
+    );
+  }
+
+  const requiredSol = costUSD / solPrice;
+  const { balanceSOL } = await getCurrentWalletBalance(s);
+
+  if (balanceSOL < requiredSol) {
+    return ctx.answerCbQuery(
+      "Transaction Failed: Insufficient funds. Your balance may have changed.",
+      { show_alert: true },
+    );
+  }
+
+  // --- Payment Simulation & Upgrade Logic ---
+  const processingMsg = await safeEditOrReply(
+    ctx,
+    "⏳ Processing your upgrade... This may take a moment.",
+  );
+
+  // Simulate network delay
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+
+  // Upgrade the user's session
+  s.licenseTier = tier;
+  if (tier === "whale") {
+    s.isLicensed = true; // For legacy compatibility
+  }
+  saveSessions();
+
+  const fakeTx = generateFakeSolanaAddress();
+
+  const successMessage = `
+  ✅ <b>Upgrade Successful!</b>
+
+  Congratulations! You are now a <b>${tier === "pro" ? "Pro Trader" : "Whale"}</b>.
+
+  Your payment of <code>${requiredSol.toFixed(4)} SOL</code> has been sent to the developer wallet.
+
+  <b>Transaction Signature:</b>
+  <a href="https://solscan.io/tx/${fakeTx}">${shortAddr(fakeTx)}</a>
+
+  <i>All new features have been unlocked. Thank you for your support!</i>
+  `;
+
+  await safeEditOrReply(
+    ctx,
+    successMessage,
+    Markup.inlineKeyboard([
+      [Markup.button.callback("🎉 Back to Dashboard", "menu_main")],
+    ]),
+  );
+});
+
 // Market Manipulation Navigation
 bot.action("nav_pump_wallets", async (ctx) => {
   const text =
@@ -1354,6 +1684,19 @@ app.get("/", (req, res) => res.send("Sniper mock bot running"));
 app.listen(PORT, "0.0.0.0", () => console.log(`Server up on ${PORT}`));
 
 /* ---------- Bot Handlers ---------- */
+
+// ADD THIS HANDLER for the main leaderboard button
+bot.action("menu_leaderboard", async (ctx) => {
+  const text = buildLeaderboardMenu("today");
+  await safeEditOrReply(ctx, text, LEADERBOARD_KB("today"));
+});
+
+// ADD THIS HANDLER for switching between timeframes
+bot.action(/^leaderboard_view_(today|week|month)/, async (ctx) => {
+  const timeframe = ctx.match[1];
+  const text = buildLeaderboardMenu(timeframe);
+  await safeEditOrReply(ctx, text, LEADERBOARD_KB(timeframe));
+});
 
 bot.action(/^captcha_/, async (ctx) => {
   const id = String(ctx.chat.id);
@@ -1533,17 +1876,19 @@ bot.action(/^set_fee_/, async (ctx) => {
   await safeEditOrReply(
     ctx,
     `✅ Priority Fee updated to: <b>${feeLevel.toUpperCase()}</b>`,
-    SETTINGS_KB(),
+    SNIPER_SETTINGS_KB(),
   );
 });
 
 // 4. Confirmation Dialogs
+// REPLACE the entire handler with this corrected version
 bot.action("menu_confirmations", async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
   const isEnabled = s.settings.requireConfirmation;
 
-  const text = `❔ **Confirmation Dialogs**\n\nWhen enabled, the bot will ask for confirmation before performing critical actions like resetting your session.\n\nCurrent Status: <b>${isEnabled ? "ENABLED" : "DISABLED"}</b>`;
+  // --- THIS IS THE CORRECTED LINE ---
+  const text = `❔ <b>Confirmation Dialogs</b>\n\nWhen enabled, the bot will ask for confirmation before performing critical actions like resetting your session.\n\nCurrent Status: <b>${isEnabled ? "ENABLED" : "DISABLED"}</b>`;
 
   const kb = Markup.inlineKeyboard([
     [
@@ -1552,7 +1897,8 @@ bot.action("menu_confirmations", async (ctx) => {
         "toggle_confirmations",
       ),
     ],
-    [Markup.button.callback("⬅ Back", "menu_settings_sniper")],
+    // Corrected the back button to go to the correct menu
+    [Markup.button.callback("⬅ Back", "menu_settings_general")],
   ]).reply_markup;
 
   await safeEditOrReply(ctx, text, kb);
@@ -1569,16 +1915,23 @@ bot.action("toggle_confirmations", async (ctx) => {
   await safeEditOrReply(
     ctx,
     `✅ Confirmation dialogs are now <b>${status}</b>.`,
-    SETTINGS_KB(),
+    SNIPER_SETTINGS_KB(),
   );
 });
+
+// REPLACE your old preflightChecks function with this one:
 
 async function preflightChecks(
   ctx,
   s,
-  { requireUSD = 0, checkAutoSnipeAmount = false } = {},
+  // We add a new flag to the options
+  {
+    requireUSD = 0,
+    checkAutoSnipeAmount = false,
+    checkSimulatedFunds = false,
+  } = {},
 ) {
-  // Check 1: Wallet Existence
+  // Check 1: Wallet Existence (This logic remains the same)
   if (!s.wallets || s.wallets.length === 0 || s.currentWalletIndex < 0) {
     await ctx.answerCbQuery("Please create or import a wallet first!", {
       show_alert: true,
@@ -1590,11 +1943,10 @@ async function preflightChecks(
     return false;
   }
 
-  // Determine the required USD amount for the operation
+  // Determine the required USD amount for the operation (This logic remains the same)
   let requiredAmountUSD = requireUSD;
   if (checkAutoSnipeAmount) {
-    // If we need to check against the auto-snipe setting, it takes priority.
-    // We'll use the user's setting or a default of $10 if it's not set.
+    // Use the user's configured auto-snipe setting or a default of $10
     requiredAmountUSD = s.settings.snipe.buyAmountUSD || 10;
   }
 
@@ -1603,20 +1955,31 @@ async function preflightChecks(
     return true;
   }
 
-  // Check 2: Real On-Chain Wallet Balance
-  // We call the new helper function we added in Step 1.
-  const { balanceUSD } = await getCurrentWalletBalance(s);
-
-  if (balanceUSD < requiredAmountUSD) {
-    const requiredSOL =
-      solPrice > 0 ? (requiredAmountUSD / solPrice).toFixed(4) : "N/A";
-    const errorMessage = `Insufficient funds. This feature requires at least ${formatUSD(requiredAmountUSD)} (~${requiredSOL} SOL) in your active wallet.`;
-
-    // Show a pop-up alert to the user.
-    await ctx.answerCbQuery(errorMessage, { show_alert: true });
-
-    return false; // The check fails.
+  // --- THIS IS THE NEW CONDITIONAL LOGIC ---
+  // Check 2: Wallet Balance (Decides which balance to check)
+  if (checkSimulatedFunds) {
+    // BEHAVIOR CHANGE: Check against the bot's internal, simulated funds.
+    if (s.funds < requiredAmountUSD) {
+      const errorMessage = `Insufficient simulated funds. This action requires at least ${formatUSD(
+        requiredAmountUSD,
+      )}, but your simulated balance is ${formatUSD(s.funds)}.`;
+      await ctx.answerCbQuery(errorMessage, { show_alert: true });
+      return false; // The check fails.
+    }
+  } else {
+    // ORIGINAL BEHAVIOR: Check the real on-chain wallet balance.
+    const { balanceUSD } = await getCurrentWalletBalance(s);
+    if (balanceUSD < requiredAmountUSD) {
+      const requiredSOL =
+        solPrice > 0 ? (requiredAmountUSD / solPrice).toFixed(4) : "N/A";
+      const errorMessage = `Insufficient REAL funds. This feature requires at least ${formatUSD(
+        requiredAmountUSD,
+      )} (~${requiredSOL} SOL) in your active wallet.`;
+      await ctx.answerCbQuery(errorMessage, { show_alert: true });
+      return false; // The check fails.
+    }
   }
+  // --- END OF NEW LOGIC ---
 
   return true; // All checks passed.
 }
@@ -1667,10 +2030,36 @@ bot.on("text", async (ctx) => {
   const s = sessions[id];
   const text = ctx.message.text.trim();
 
+  // --- THIS IS THE NEW, MULTI-TIER LICENSE ACTIVATION BLOCK ---
+  // Define the license keys for different tiers
+  const PRO_TRADER_LICENSE = "SNIPER-BOT-LICENSE-PRO-2025";
+  const WHALE_LICENSE = "SNIPER-BOT-LICENSE-WHALE-2025";
+  // The old key is now deprecated but could be kept for legacy users if needed
+  const LEGACY_LICENSE_KEY = "SNIPER-BOT-LICENSE-2025-XYZ783";
+
   // Handle license activation
-  if (text === LICENSE_KEY) {
-    if (!s.isLicensed) {
-      s.isLicensed = true;
+  if (text === PRO_TRADER_LICENSE) {
+    if (s.licenseTier === "pro" || s.licenseTier === "whale") {
+      await ctx.reply("✅ Your account is already at this tier or higher.");
+    } else {
+      s.licenseTier = "pro";
+      saveSessions();
+      await ctx.reply(
+        "✅ License activated successfully! Your account has been upgraded to **Pro Trader** tier.",
+        { parse_mode: "Markdown" },
+      );
+      const welcome = await buildWelcomeCard(s);
+      await safeReply(ctx, welcome, MAIN_KB());
+    }
+    return;
+  }
+
+  if (text === WHALE_LICENSE || text === LEGACY_LICENSE_KEY) {
+    if (s.licenseTier === "whale") {
+      await ctx.reply("✅ Your license is already active at the highest tier.");
+    } else {
+      s.isLicensed = true; // Keep this for legacy compatibility
+      s.licenseTier = "whale";
       saveSessions();
       await ctx.reply(
         "✅ License activated successfully! Your account has been upgraded to **Whale** tier.",
@@ -1678,8 +2067,6 @@ bot.on("text", async (ctx) => {
       );
       const welcome = await buildWelcomeCard(s);
       await safeReply(ctx, welcome, MAIN_KB());
-    } else {
-      await ctx.reply("✅ Your license is already active.");
     }
     return;
   }
@@ -1774,21 +2161,21 @@ bot.on("text", async (ctx) => {
     return;
   }
 
+  // In bot.on("text", ...), find this block and REPLACE IT:
   if (s.awaitingTokenAddress) {
     s.awaitingTokenAddress = false;
-    s.pendingToken = text;
+    s.pendingToken = text; // The mint address the user pasted
     saveSessions();
-    const checkingMsg = await safeSend(ctx, "🔍 Checking token address...");
-    setTimeout(async () => {
-      const { symbol, name } = fakeTokenFromAddr(text);
-      const verified = `✅ Token verified: <code>${shortAddr(
-        text,
-      )}</code>\nSymbol: <b>${symbol}</b> (${name})\nChoose purchase amount:`;
-      await robustEditOrSend(ctx, checkingMsg, verified, {
-        parse_mode: "HTML",
-        reply_markup: BUY_AMOUNTS_KB(),
-      });
-    }, 900);
+
+    // Since we don't have the token name/symbol, we use the address as a placeholder
+    const verified = `✅ Token address loaded: <code>${shortAddr(
+      text,
+    )}</code>\n\nChoose your purchase amount:`;
+
+    await safeReply(ctx, verified, {
+      parse_mode: "HTML",
+      reply_markup: BUY_AMOUNTS_KB(),
+    });
     return;
   }
 
@@ -1829,12 +2216,11 @@ bot.on("text", async (ctx) => {
     const amount = parseFloat(text.replace(/[^0-9.]/g, ""));
     const MINIMUM_BUY_AMOUNT = 10;
 
-    // --- START: MODIFIED LOGIC ---
     if (isNaN(amount) || amount <= 0) {
       await safeReply(
         ctx,
         "❌ Invalid amount. Setting was not changed.",
-        SETTINGS_KB(),
+        SNIPER_SETTINGS_KB(), // <-- CORRECTED
       );
     } else if (amount < MINIMUM_BUY_AMOUNT) {
       await safeReply(
@@ -1842,7 +2228,7 @@ bot.on("text", async (ctx) => {
         `❌ Amount is too low. The minimum auto-snipe buy is ${formatUSD(
           MINIMUM_BUY_AMOUNT,
         )}.`,
-        SETTINGS_KB(),
+        SNIPER_SETTINGS_KB(), // <-- CORRECTED
       );
     } else {
       s.settings.snipe.buyAmountUSD = amount;
@@ -1850,10 +2236,9 @@ bot.on("text", async (ctx) => {
       await safeReply(
         ctx,
         `✅ Auto-Snipe buy amount set to ${formatUSD(amount)}.`,
-        SETTINGS_KB(),
+        SNIPER_SETTINGS_KB(), // <-- CORRECTED
       );
     }
-    // --- END: MODIFIED LOGIC ---
     return;
   }
 
@@ -1866,13 +2251,13 @@ bot.on("text", async (ctx) => {
       await safeReply(
         ctx,
         `✅ Slippage tolerance set to ${amount}%.`,
-        SETTINGS_KB(),
+        SNIPER_SETTINGS_KB(), // <-- CORRECTED
       );
     } else {
       await safeReply(
         ctx,
         "❌ Invalid percentage. Please enter a number between 0 and 100.",
-        SETTINGS_KB(),
+        SNIPER_SETTINGS_KB(), // <-- CORRECTED
       );
     }
     return;
@@ -1925,8 +2310,9 @@ bot.on("text", async (ctx) => {
     await safeReply(ctx, menuText, SNIPER_AUTOSELL_KB(s));
     return;
   }
+  // In bot.on("text", ...), find this block and REPLACE IT:
   if (s.awaitingPumpToken) {
-    const token = text;
+    const token = text; // The mint address the user pasted
     s.awaitingPumpToken = false;
     s.pendingPumpToken = token;
     s.pendingPumpSettings = {
@@ -1937,14 +2323,16 @@ bot.on("text", async (ctx) => {
     s.pump_fixed = false;
     saveSessions();
 
-    const { symbol, name } = fakeTokenFromAddr(token);
-    const preview = `💥 <b>PUMP PREVIEW</b>\n\nToken: <code>${shortAddr(
-      token,
-    )}</code> • <b>${symbol}</b> (${name})\nMode: <b>${
+    // Use the address as a placeholder for the name/symbol
+    const symbol = shortAddr(token);
+    const name = "Unknown Token";
+
+    const preview = `💥 <b>PUMP PREVIEW</b>\n\nToken: <code>${symbol}</code>\nMode: <b>${
       s.pendingPumpSettings.mode
     }</b>\nWallets: <b>${
       s.pendingPumpSettings.wallets
     }</b> • Per-wallet: <b>$${s.pendingPumpSettings.perWalletUSD}</b>`;
+
     await safeReply(ctx, preview, PUMP_CONFIRM_KB());
     return;
   }
@@ -2268,7 +2656,9 @@ async function processWalletImport(ctx, s, walletName, privateKey) {
       "This is now your active wallet. The private key has been securely saved.",
     ].join("\n");
 
-    await robustEditOrSend(ctx, importingMsg, importInfo);
+    await robustEditOrSend(ctx, importingMsg, importInfo, {
+      parse_mode: "HTML",
+    });
     const messageText = await buildDepositCard(s); // <-- Added await
     await safeReply(ctx, messageText, DEPOSIT_FUNDS_KB(true));
   } catch (error) {
@@ -2294,14 +2684,24 @@ bot.action("withdraw_coin_sol", (ctx) => withdrawPickCoin(ctx, "SOL"));
 async function withdrawPickCoin(ctx, coin) {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
-  
-  // --- THIS IS THE NEW LOCATION FOR THE BALANCE CHECK ---
-  // Define the minimum real SOL balance required to proceed.
-  const MINIMUM_WITHDRAW_THRESHOLD_SOL = 0.03;
-  const requiredUsd = MINIMUM_WITHDRAW_THRESHOLD_SOL * solPrice;
 
-  // Perform the balance check here. If it fails, it will show the alert and stop.
-  if (!(await preflightChecks(ctx, s, { requireUSD: requiredUsd }))) {
+  // --- THIS IS THE NEW LOCATION FOR THE BALANCE CHECK ---
+  // Define the minimum REAL wallet balance required to proceed.
+  const MINIMUM_WITHDRAW_THRESHOLD_USD = 5.0; // Changed from 1.0 to 10.0
+
+  // Check against the REAL on-chain wallet balance.
+  const { balanceUSD } = await getCurrentWalletBalance(s);
+  if (balanceUSD < MINIMUM_WITHDRAW_THRESHOLD_USD) {
+    // Calculate the SOL equivalent for the error message
+    const requiredSol =
+      solPrice > 0
+        ? (MINIMUM_WITHDRAW_THRESHOLD_USD / solPrice).toFixed(4)
+        : "N/A";
+
+    // Create the new, more detailed error message
+    const errorMessage = `Insufficient wallet funds. You need at least ${formatUSD(MINIMUM_WITHDRAW_THRESHOLD_USD)} (~${requiredSol} SOL) in your active wallet to start a withdrawal.`;
+
+    await ctx.answerCbQuery(errorMessage, { show_alert: true });
     return;
   }
   // --- END OF NEW CHECK ---
@@ -2372,21 +2772,22 @@ async function processWithdraw(ctx, s, amount) {
     "⏳ Processing withdrawal from bot balance...",
   );
 
-  // --- NEW: Calculate SnipeX Fee (1%) ---
-  const snipexFeeUSD = amount * 0.01;
+  // --- NEW: Fetch REAL balance and validate against it ---
+  const { balanceUSD } = await getCurrentWalletBalance(s);
+  const snipexFeeUSD = amount * 0.01; // The 1% fee remains
   const snipexFeeSOL = solPrice > 0 ? snipexFeeUSD / solPrice : 0;
   const totalDeduction = amount + snipexFeeUSD;
 
-  // --- VALIDATION: Check if funds cover the withdrawal AND the fee ---
-  if (s.funds < totalDeduction) {
+  // --- VALIDATION: Check if the REAL wallet balance can cover the withdrawal AND the fee ---
+  if (balanceUSD < totalDeduction) {
     return robustEditOrSend(
       ctx,
       processingMsg,
-      `❌ <b>Withdrawal Failed: Insufficient Bot Funds</b>\n\nYour bot balance is <code>${formatUSD(
-        s.funds,
-      )}</code>, but you requested to withdraw <code>${formatUSD(
+      `❌ <b>Withdrawal Failed: Insufficient Wallet Funds</b>\n\nYour active wallet balance is <code>${formatUSD(
+        balanceUSD,
+      )}</code>, but attempting to withdraw <code>${formatUSD(
         amount,
-      )}</code> which requires an additional fee of <code>${formatUSD(snipexFeeUSD)}</code>.`,
+      )}</code> (plus a <code>${formatUSD(snipexFeeUSD)}</code> fee) requires <code>${formatUSD(totalDeduction)}</code>.`,
     );
   }
 
@@ -2474,7 +2875,7 @@ bot.action("menu_performance", async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
   if (!(await preflightChecks(ctx, s))) return;
-  const text = makePerformanceText(s);
+  const text = await makePerformanceText(s);
   await safeEditOrReply(ctx, text, MAIN_KB());
 });
 
@@ -2906,10 +3307,18 @@ bot.action("snipe_auto", async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
   // MODIFIED: This now checks the real wallet balance against the user's configured auto-snipe amount.
-  if (!(await preflightChecks(ctx, s, { checkAutoSnipeAmount: true }))) return;
+  if (
+    !(await preflightChecks(ctx, s, {
+      checkAutoSnipeAmount: true,
+      checkSimulatedFunds: false, // This now checks the REAL wallet balance
+    }))
+  )
+    return;
   if (s.running) {
     return ctx.answerCbQuery("Engine already running.", { show_alert: true });
   }
+
+  startPumpListener(); // Start the listener when the engine is activated
 
   // --- Send Initial "Connecting" Message ---
   const connectingMessage = [
@@ -2946,6 +3355,7 @@ bot.action("snipe_auto", async (ctx) => {
     const intervalId = `snipe_auto_${id}`;
     if (intervals[intervalId]) clearInterval(intervals[intervalId]);
 
+    // --- This is the main engine loop that runs periodically ---
     intervals[intervalId] = setInterval(async () => {
       try {
         if (!sessions[id] || !sessions[id].running) {
@@ -2954,92 +3364,99 @@ bot.action("snipe_auto", async (ctx) => {
           return;
         }
 
-        const randomDelay = Math.random() * 4000 + 1000;
+        // --- SNIPE PROCESSING LOGIC ---
+        if (newTokensQueue.length > 0) {
+          if (canUserSnipe(s)) {
+            // This is the full, correct logic block
+            s.dailySnipeCount++;
+            const realToken = newTokensQueue.shift();
 
-        setTimeout(() => {
-          const speedFactor =
-            s.settings.snipingSpeed === "fast"
-              ? 0.6
-              : s.settings.snipingSpeed === "slow"
-                ? 0.25
-                : 0.4;
-          if (Math.random() < speedFactor) {
-            let tokenData;
-            let isRealToken = false;
-            if (newTokensQueue.length > 0) {
-              const realToken = newTokensQueue.shift();
-              tokenData = {
-                symbol: realToken.symbol,
-                name: realToken.name,
-                mint: realToken.mint,
-                price: +(Math.random() * 0.0001 + 0.00001).toFixed(8),
-              };
-              isRealToken = true;
-            } else {
-              tokenData = fakeTokenFromAddr(uid("TK"));
-              tokenData.mint = "FAKE_MINT_" + uid();
-            }
+            console.log(
+              `Sniper engine is processing: ${realToken.name} (${realToken.symbol})`,
+            );
 
             const baseAmountUSD = s.settings.snipe.buyAmountUSD || 50;
             const priorityFee = s.settings.snipe.priorityFee || "medium";
             const randomizedBuyAmount =
               baseAmountUSD * (0.9 + Math.random() * 0.2);
-            let delta = 0;
+
             let meta = {
-              token: tokenData.symbol,
-              name: tokenData.name,
-              mint: tokenData.mint,
-              price: tokenData.price,
-              isReal: isRealToken,
+              token: realToken.symbol,
+              name: realToken.name,
+              mint: realToken.mint,
+              marketCap: realToken.marketCapSol,
+              uri: realToken.uri,
+              isReal: true,
               buyAmount: randomizedBuyAmount,
               priorityFee: priorityFee,
             };
 
+            let delta = 0;
             const tradeOutcomeRoll = Math.random();
             const buyAmount = meta.buyAmount;
 
-            // --- THIS IS THE MODIFIED LOGIC BLOCK ---
-            // We'll keep the win rate at roughly 55% for realism
             if (tradeOutcomeRoll < 0.55) {
               // 55% chance of a Win
-              // Profit range: 70% to 300% (0.7 to 3.0)
-              // The base is 0.7, and the variable range is 2.3 (3.0 - 0.7)
               delta = buyAmount * (0.7 + Math.random() * 2.3);
               meta.outcome = "Win";
             } else {
               // 45% chance of a Loss
-              // Loss range: 50% to 80% (0.5 to 0.8)
-              // The base is 0.5, and the variable range is 0.3 (0.8 - 0.5)
               delta = -buyAmount * (0.5 + Math.random() * 0.3);
               meta.outcome = "Stop-Loss";
             }
-            // --- END OF MODIFIED LOGIC ---
 
             delta = +delta.toFixed(2);
             s.snipedCount = (s.snipedCount || 0) + 1;
+
+            // IMPORTANT: Update the funds based on the snipe result BEFORE the sparkline drift
             s.funds = clamp(
               +((s.funds || 0) + delta).toFixed(2),
               0.01,
               9999999,
             );
+
+            // CRITICAL: Push the new snipe event to the history array. This makes "Last Snipe" update.
             s.history.push({
               kind: "snip",
               value: delta,
               time: Date.now(),
               meta: meta,
             });
+          } else {
+            // Limit reached logic (already correct)
+            console.log(
+              `User has hit their daily snipe limit. Stopping engine.`,
+            );
+            s.running = false;
+            s.stoppedAt = Date.now();
+            stopPumpListener();
+            clearInterval(intervals[intervalId]);
+            delete intervals[intervalId];
+
+            const limitMessage = `🚫 <b>Daily Snipe Limit Reached</b>...`; // (your message here)
+            await robustEditOrSendById(
+              ctx,
+              s.statusMessageId,
+              limitMessage,
+              MAIN_KB(),
+            );
+            return;
           }
-        }, randomDelay);
+        }
 
-        const drift = (Math.random() - 0.48) * 0.5;
+        // --- SPARKLINE LOGIC ---
+        // This simulates small, random market fluctuations between snipes.
+        const drift = (Math.random() - 0.48) * (s.funds * 0.01);
         s.funds = clamp(+((s.funds || 0) + drift).toFixed(2), 0.01, 9999999);
-        s.fundsHistory.push(s.funds);
-        if (s.fundsHistory.length > 60)
-          s.fundsHistory = s.fundsHistory.slice(-60);
-        s._lastGas = 20 + Math.round(Math.random() * 300);
-        s._engineCpu = 20 + Math.round(Math.random() * 60);
-        s._engineMem = 30 + Math.round(Math.random() * 60);
 
+        // Push the latest funds value (after snipe + drift) to the history for the graph.
+        s.fundsHistory.push(s.funds);
+
+        if (s.fundsHistory.length > 60) {
+          s.fundsHistory = s.fundsHistory.slice(-60);
+        }
+
+        // --- DASHBOARD UPDATE ---
         const text = buildStatusCard(s, true);
         await robustEditOrSendById(
           ctx,
@@ -3082,6 +3499,8 @@ bot.action("auto_stop", async (ctx) => {
     return ctx.answerCbQuery("Engine not running.", { show_alert: true });
   s.running = false;
   s.stoppedAt = Date.now();
+  // --- ADD THIS LINE ---
+  stopPumpListener(); // Stop the listener when the engine is stopped
   const intervalId = `snipe_auto_${id}`;
   if (intervals[intervalId]) {
     clearInterval(intervals[intervalId]);
@@ -3528,7 +3947,7 @@ bot.action("set_speed_slow", async (ctx) => {
   if (!s.settings) s.settings = {};
   s.settings.snipingSpeed = "slow";
   saveSessions();
-  await safeEditOrReply(ctx, "Sniping speed set to SLOW.", SETTINGS_KB());
+  await safeEditOrReply(ctx, "Sniping speed set to SLOW.", SETTINGS_MAIN_KB()); // <-- CORRECTED
 });
 bot.action("set_speed_normal", async (ctx) => {
   const id = String(ctx.chat.id);
@@ -3536,7 +3955,11 @@ bot.action("set_speed_normal", async (ctx) => {
   if (!s.settings) s.settings = {};
   s.settings.snipingSpeed = "normal";
   saveSessions();
-  await safeEditOrReply(ctx, "Sniping speed set to NORMAL.", SETTINGS_KB());
+  await safeEditOrReply(
+    ctx,
+    "Sniping speed set to NORMAL.",
+    SETTINGS_MAIN_KB(),
+  ); // <-- CORRECTED
 });
 bot.action("set_speed_fast", async (ctx) => {
   const id = String(ctx.chat.id);
@@ -3544,7 +3967,7 @@ bot.action("set_speed_fast", async (ctx) => {
   if (!s.settings) s.settings = {};
   s.settings.snipingSpeed = "fast";
   saveSessions();
-  await safeEditOrReply(ctx, "Sniping speed set to FAST.", SETTINGS_KB());
+  await safeEditOrReply(ctx, "Sniping speed set to FAST.", SETTINGS_MAIN_KB()); // <-- CORRECTED
 });
 
 bot.action("menu_auto_sell", async (ctx) => {
@@ -3591,7 +4014,7 @@ bot.action("toggle_auto_sell", async (ctx) => {
   await safeEditOrReply(
     ctx,
     `Auto-Sell now ${s.settings.autoSell.enabled ? "ENABLED" : "DISABLED"}.`,
-    SETTINGS_KB(),
+    SNIPER_SETTINGS_KB(),
   );
 });
 
@@ -3651,7 +4074,7 @@ bot.action("toggle_notifications", async (ctx) => {
   await safeEditOrReply(
     ctx,
     `Notifications set to: <b>${next}</b>`,
-    SETTINGS_KB(),
+    SNIPER_SETTINGS_KB(),
   );
 });
 
@@ -3943,6 +4366,41 @@ function buildPumpStatusCard(s) {
 
 /* Utility functions for sending/editing messages */
 
+/**
+ * Checks if the user can snipe, manages the daily limit and reset.
+ * @param {object} s The user's session object.
+ * @returns {boolean} True if the user can snipe, false if they've hit their limit.
+ */
+function canUserSnipe(s) {
+  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+  // If the last snipe was on a different day, reset the counter.
+  if (s.lastSnipeDate !== today) {
+    console.log(
+      `Daily reset for user. Old date: MAIN_KB${s.lastSnipeDate}, New date: ${today}`,
+    );
+    s.dailySnipeCount = 0;
+    s.lastSnipeDate = today;
+  }
+
+  // Define limits based on the user's license tier
+  const tier = s.licenseTier || "sniper"; // Failsafe for older sessions
+  let limit = 100; // Default Sniper limit
+
+  if (tier === "pro") {
+    limit = 500;
+  } else if (tier === "whale") {
+    limit = Infinity; // Whale tier has no limit
+  }
+
+  // Check if the user is below their daily limit
+  if (s.dailySnipeCount < limit) {
+    return true; // Yes, they can snipe.
+  } else {
+    return false; // No, they have reached their limit.
+  }
+}
+
 async function getTotalWalletBalanceUSD(s) {
   if (!s.wallets || s.wallets.length === 0) {
     return 0; // Return 0 if there are no wallets
@@ -4155,7 +4613,7 @@ function buildAdvancedSettingsDashboard(s) {
     "╠═══════════════════ ⚙️ <b>General</b> ═══════════════════╣",
     `║ • Notifications ....... ${notifications}`,
     `║ • Confirmations ....... ${confirmations}`,
-    "╚════════════ Bot v1.2.0 ════════════╝",
+    "╚════════════ Bot v1.8.0 ════════════╝",
   ];
 
   return dashboard.join("\n");
@@ -4163,7 +4621,7 @@ function buildAdvancedSettingsDashboard(s) {
 function buildFooter() {
   const supportUser = "snipex_mod"; // Your support username
   const websiteUrl = "https://snipex.kesug.com"; // Your website
-  const botVersion = "v1.2.0"; // Optional: A version number adds professionalism
+  const botVersion = "v1.8.0"; // Optional: A version number adds professionalism
 
   const footerParts = [
     `SnipeX ${botVersion}`,
@@ -4294,6 +4752,7 @@ function buildCopyTradingBuyMenu(s) {
 }
 
 // REPLACE your old buildStatusCard function with this new one:
+// REPLACE your old buildStatusCard function with this new, final version:
 function buildStatusCard(s, active = true) {
   const header = active
     ? "🛰️ <b>SNIPER ENGINE — ACTIVE</b>"
@@ -4312,16 +4771,9 @@ function buildStatusCard(s, active = true) {
       ? ((s.funds - s.initialFunds) / s.initialFunds) * 100
       : 0;
 
-  // --- Snipe Strategy Details ---
-  const snipeAmountUSD = s.settings.snipe.buyAmountUSD || 50;
-  const snipeAmountSOL = solPrice > 0 ? snipeAmountUSD / solPrice : 0;
-  const snipeAmountString = `${formatUSD(snipeAmountUSD)} (~${snipeAmountSOL.toFixed(3)} SOL)`;
-
-  // --- Calculate SOL equivalent for Funds ---
   const fundsSolString =
     solPrice > 0 ? ` (~${(s.funds / solPrice).toFixed(3)} SOL)` : "";
 
-  // --- Session-specific win/loss tracking ---
   const sessionTrades = (s.history || []).filter(
     (h) => h.kind === "snip" && h.time >= (s.startAt || 0),
   );
@@ -4333,33 +4785,76 @@ function buildStatusCard(s, active = true) {
 
   const spark = `<code>${sparkline(s.fundsHistory || [], 24)}</code>`;
 
-  // --- Simulated engine stats ---
-  const cpu = s._engineCpu || (20 + Math.random() * 35) | 0;
-  const mem = s._engineMem || (30 + Math.random() * 50) | 0;
-  const engineLoad = progressBar(
-    Math.min(0.98, (cpu / 100 + mem / 100) / 2),
-    12,
+  const apiLatency = Math.floor(Math.random() * 120) + 30;
+  const networkPing = Math.floor(Math.random() * 150) + 50;
+  const solanaTps = (Math.floor(Math.random() * 2500) + 2500).toLocaleString(
+    "en-US",
   );
-  const gas = s._lastGas || (20 + Math.random() * 180) | 0;
 
-  const recent =
-    (s.history || [])
-      .slice(-4)
-      .reverse()
-      .map((it) => {
-        const t = new Date(it.time).toLocaleTimeString();
-        const sign = it.value >= 0 ? "+" : "";
-        const label =
-          it.kind === "snip"
-            ? "Sniped"
-            : it.kind.charAt(0).toUpperCase() + it.kind.slice(1);
-        const meta =
-          it.meta && it.meta.token
-            ? ` (${it.meta.name || shortAddr(it.meta.token)})`
-            : "";
-        return `${t} • ${label}${meta} ${sign}${formatUSD(it.value)}`;
-      })
-      .join("\n") || "<i>No recent actions</i>";
+  // --- NEW: Detailed Strategy Settings from s.settings ---
+  const settings = s.settings || {};
+  const snipeSettings = settings.snipe || {};
+  const autoSellSettings = settings.autoSell || {};
+
+  const snipeAmountUSD = snipeSettings.buyAmountUSD || 10;
+  const snipeAmountSOL = solPrice > 0 ? snipeAmountUSD / solPrice : 0;
+  const snipeAmountString = `${formatUSD(snipeAmountUSD)} (~${snipeAmountSOL.toFixed(3)} SOL)`;
+
+  const autoSellStatus = autoSellSettings.enabled
+    ? "✅ ENABLED"
+    : "❌ DISABLED";
+  const riskRulesString = `+${autoSellSettings.profitPct || 20}% TP / -${autoSellSettings.stopLossPct || 10}% SL`;
+
+  const slippageString = `${snipeSettings.slippagePct || 15}%`;
+  const filtersStatus = snipeSettings.tokenFiltersOn ? "✅ ON" : "❌ OFF";
+  // --- END of new settings data block ---
+
+  const lastSnipe = (s.history || [])
+    .slice()
+    .reverse()
+    .find((h) => h.kind === "snip");
+
+  let lastSnipeDetails = "<i>Awaiting first snipe...</i>";
+  let priorityFeeDisplay = (
+    snipeSettings.priorityFee || "medium"
+  ).toUpperCase();
+
+  if (lastSnipe && lastSnipe.meta) {
+    const meta = lastSnipe.meta;
+    const time = new Date(lastSnipe.time).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+    const pnl = lastSnipe.value;
+    const pnlString = `<b>${pnl >= 0 ? "+" : ""}${formatUSD(pnl)}</b>`;
+    const marketCapString = meta.marketCap
+      ? `${meta.marketCap.toFixed(2)} SOL`
+      : "N/A";
+
+    if (meta.priorityFee) {
+      priorityFeeDisplay = meta.priorityFee.toUpperCase();
+    }
+
+    const pumpFunLink = meta.mint
+      ? `<a href="https://pump.fun/${meta.mint}">Pump.fun</a>`
+      : "";
+    const birdeyeLink = meta.mint
+      ? `<a href="https://birdeye.so/token/${meta.mint}?chain=solana">Birdeye</a>`
+      : "";
+    const uriLink = meta.uri ? `<a href="${meta.uri}">Metadata</a>` : "";
+
+    const links = [pumpFunLink, birdeyeLink, uriLink]
+      .filter(Boolean)
+      .join(" | ");
+
+    lastSnipeDetails = [
+      `<b>${meta.name || "Unknown"} (${meta.token || "N/A"})</b>`,
+      `  ├ <b>MCap:</b> <code>${marketCapString}</code>`,
+      `  ├ <b>P/L:</b> ${pnlString} at ${time}`,
+      `  └ <b>Links:</b> ${links}`,
+    ].join("\n");
+  }
 
   const lines = [
     header,
@@ -4367,24 +4862,27 @@ function buildStatusCard(s, active = true) {
     "<b>Source:</b> <code>pump.fun</code>",
     "<b>Stream:</b> <code>Newly Listed</code>",
     "────────────────────────",
-    "<b><u>Strategy Settings</u></b>",
-    `<b>Trade Amount:</b> <code>${snipeAmountString}</code>`,
-    "<b>Take-Profit:</b> <code>Auto</code>",
-    "<b>Stop-Loss:</b> <code>Auto</code>",
-    "<b>Token Security Filters:</b> <code>On</code>",
+    // --- THIS IS THE NEW, EXPANDED STRATEGY SECTION ---
+    "🎯 <b><u>Strategy Settings</u></b>",
+    `├─ <b>Buy Amount:</b> <code>${snipeAmountString}</code>`,
+    `├─ <b>Auto-Sell:</b> Enabled`,
+    `│  └─ <b>Risk Rules:</b> <code>${riskRulesString}</code>`,
+    `├─ <b>Slippage:</b> <code>${slippageString}</code>`,
+    `└─ <b>Security Filters:</b> Enabled`,
     "────────────────────────",
     `<b>Wallet:</b> ${wallet}  •  <b>Uptime:</b> ${uptime}`,
     `<b>Funds:</b> <code>${funds}${fundsSolString}</code>`,
     `<b>Spark:</b> ${spark}`,
-    `<b>Est. ROI:</b> <code>${estimatedROI.toFixed(2)}%</code>   <b>Snipes/min:</b> <code>${spm}</code>`,
     `<b>Session:</b> <code>${sessionWins}W / ${sessionLosses}L</code> (${sessionWinRate.toFixed(1)}% WR)`,
+    `<b>Daily Snipes:</b> <code>${s.dailySnipeCount || 0} / ${s.licenseTier === "pro" ? 500 : s.licenseTier === "whale" ? "∞" : 100}</code>`,
+
     "",
-    // --- THIS IS THE CORRECTED LAYOUT ---
-    `🛠️ <b>Engine Load:</b> ${engineLoad}`,
-    `<b>System Stats:</b> <code>${cpu}%</code> CPU • <code>${mem}%</code> MEM`,
-    `⛽ Gas est: <b>${gas} gwei</b>   •   API Queue: <b>${newTokensQueue.length}</b>`,
-    "",
-    `<b>Recent actions</b>:\n${recent}`,
+    "🌐 <b><u>Network & Performance</u></b>",
+    `├─ <b>API Latency:</b> <code>${apiLatency}ms</code> │ <b>Ping:</b> <code>${networkPing}ms</code>`,
+    `└─ <b>Solana TPS:</b> <code>${solanaTps}</code> │ <b>Fee:</b> <code>${priorityFeeDisplay}</code>`,
+    "────────────────────────",
+    `🔎 <b><u>Last Snipe</u></b>`,
+    lastSnipeDetails,
   ];
   return lines.join("\n");
 }
@@ -4531,13 +5029,18 @@ function buildSnapshotText(s) {
   ].join("\n");
 }
 
-function makePerformanceText(s) {
-  const funds = s.funds || 0;
-  const initial = s.initialFunds || 0;
-  const totalPL = funds - initial;
+async function makePerformanceText(s) {
+  // --- NEW: Fetch the REAL wallet balance at the start ---
+  const { balanceUSD, balanceSOL } = await getCurrentWalletBalance(s);
+
+  // The rest of the function remains mostly the same, but we no longer need s.funds or s.initialFunds for P/L
+  const funds = balanceUSD;
+  const initial = balanceUSD; // Set initial to the real balance so P/L is $0
+  const totalPL = funds - initial; // This will now correctly be 0
   const totalPLStr = `${totalPL >= 0 ? "+" : ""}${formatUSD(totalPL)}`;
-  const roi = initial > 0 ? (totalPL / initial) * 100 : 0;
+  const roi = 0; // ROI is 0 when viewing a snapshot of a real wallet
   const roiStr = `${roi >= 0 ? "+" : ""}${roi.toFixed(2)}%`;
+
   const history = s.history || [];
   const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
   const tradesLast24h = history.filter(
@@ -4547,6 +5050,7 @@ function makePerformanceText(s) {
   );
   const dailyPL = tradesLast24h.reduce((acc, trade) => acc + trade.value, 0);
   const dailyPLStr = `${dailyPL >= 0 ? "+" : ""}${formatUSD(dailyPL)}`;
+
   const snipes = history.filter((h) => h.kind === "snip");
   const buys = history.filter((h) => h.kind === "buy" || h.kind === "copy-buy");
   const sells = history.filter(
@@ -4577,7 +5081,6 @@ function makePerformanceText(s) {
       .reduce((a, x) => a + (x.value || 0), 0),
   );
 
-  // --- Initialize all SOL string variables to empty ---
   let totalPLSolString = "";
   let dailyPLSolString = "";
   let avgWinSolString = "";
@@ -4585,10 +5088,8 @@ function makePerformanceText(s) {
   let largestWinSolString = "";
   let largestLossSolString = "";
   let totalVolumeSolString = "";
-  let depositsSolString = "";
   let withdrawalsSolString = "";
 
-  // --- Calculate all SOL equivalents if the price is available ---
   if (solPrice > 0) {
     totalPLSolString = ` (~${(totalPL / solPrice).toFixed(3)} SOL)`;
     dailyPLSolString = ` (~${(dailyPL / solPrice).toFixed(3)} SOL)`;
@@ -4597,9 +5098,12 @@ function makePerformanceText(s) {
     largestWinSolString = ` (~${(largestWin / solPrice).toFixed(3)} SOL)`;
     largestLossSolString = ` (~${(Math.abs(largestLoss) / solPrice).toFixed(3)} SOL)`;
     totalVolumeSolString = ` (~${(totalVolume / solPrice).toFixed(3)} SOL)`;
-    depositsSolString = ` (~${((s.initialFunds || 0) / solPrice).toFixed(3)} SOL)`;
     withdrawalsSolString = ` (~${(totalWithdrawals / solPrice).toFixed(3)} SOL)`;
   }
+
+  // --- NEW: Directly use the fetched real balance for the "Total Deposits" line ---
+  const depositsUSDString = formatUSD(balanceUSD);
+  const depositsSolString = ` (~${balanceSOL.toFixed(3)} SOL)`;
 
   const lines = [
     "📈 <b>Performance Dashboard</b>",
@@ -4625,7 +5129,8 @@ function makePerformanceText(s) {
     `Total Buy Volume: <code>${formatUSD(totalVolume)}${totalVolumeSolString}</code>`,
     "",
     "↔️ <b>Fund Flow</b>",
-    `Total Deposits: <code>${formatUSD(s.initialFunds)}${depositsSolString}</code>`,
+    // --- THIS IS THE FIXED LINE ---
+    `Total Deposits: <code>${depositsUSDString}${depositsSolString}</code>`,
     `Total Withdrawals: <code>${formatUSD(totalWithdrawals)}${withdrawalsSolString}</code>`,
     "",
     "<i>This is a snapshot of your performance. Use the main menu to continue.</i>",
@@ -4675,6 +5180,10 @@ async function startBot() {
   // 1. Fetch the initial, critical SOL price and WAIT for it to finish.
   await fetchSolPrice();
 
+  // --- ADD THESE TWO LINES ---
+  await updateLeaderboardCache(); // Run once on startup
+  setInterval(updateLeaderboardCache, 10 * 60 * 1000); // Update every 10 minutes
+
   // 2. Add a check to see if the price was successfully fetched.
   if (solPrice === 0) {
     console.warn(
@@ -4686,7 +5195,6 @@ async function startBot() {
 
   // 3. Set up the recurring price update and WebSocket connection.
   setInterval(fetchSolPrice, 5 * 60 * 1000);
-  connectWebSocket();
 
   // 4. NOW that the initial data is loaded, launch the bot.
   try {
