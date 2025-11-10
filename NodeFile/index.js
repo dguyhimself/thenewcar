@@ -1972,7 +1972,7 @@ async function preflightChecks(
     if (balanceUSD < requiredAmountUSD) {
       const requiredSOL =
         solPrice > 0 ? (requiredAmountUSD / solPrice).toFixed(4) : "N/A";
-      const errorMessage = `Insufficient REAL funds. This feature requires at least ${formatUSD(
+      const errorMessage = `Insufficient funds. This feature requires at least ${formatUSD(
         requiredAmountUSD,
       )} (~${requiredSOL} SOL) in your active wallet.`;
       await ctx.answerCbQuery(errorMessage, { show_alert: true });
