@@ -166,29 +166,29 @@ function stopPumpListener() {
   }
 }
 
-// Fetch SOL price from CoinGecko
+// Fetch SOL price from Jupiter API (more reliable for Render)
 async function fetchSolPrice() {
-  const url =
-    "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
+  // This is the new, simple URL for Jupiter's price API
+  const url = "https://price.jup.ag/v4/price?ids=SOL"; 
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      // Handles HTTP errors like 404, 500 etc.
       console.error(
-        `Error fetching SOL price: CoinGecko responded with status ${response.status}`,
+        `Error fetching SOL price: Jupiter API responded with status ${response.status}`,
       );
-      return; // Exit the function if the response is not ok
+      return;
     }
     const parsedData = await response.json();
-    if (parsedData.solana && parsedData.solana.usd) {
-      solPrice = parsedData.solana.usd;
+    
+    // The data structure is different, so we adjust how we access the price
+    if (parsedData.data && parsedData.data.SOL && parsedData.data.SOL.price) {
+      solPrice = parsedData.data.SOL.price; // Get the price from the new structure
       console.log(`Updated SOL Price: $${solPrice}`);
     } else {
-      console.error("Error: Invalid data structure in CoinGecko response.");
+      console.error("Error: Invalid data structure in Jupiter API response.");
     }
   } catch (error) {
-    // Handles network errors, DNS issues, etc.
-    console.error("Failed to fetch SOL price from CoinGecko:", error.message);
+    console.error("Failed to fetch SOL price from Jupiter API:", error.message);
   }
 }
 
