@@ -166,37 +166,46 @@ function stopPumpListener() {
 }
 
 // Fetch SOL price from CoinGecko
+// Fetch SOL price from CoinGecko with a resilient fallback mechanism.
 async function fetchSolPrice() {
-  const url =
-    "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      // Handles HTTP errors like 404, 500 etc.
-      console.error(
-        `Error fetching SOL price: CoinGecko responded with status ${response.status}`,
+    const url = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
+  
+    try {
+      const response = await fetch(url);
+  
+      if (!response.ok) {
+        // --- RESILIENCE LOGIC ---
+        // Instead of failing completely, we log a warning but DO NOT change the existing solPrice.
+        // This allows the bot to continue operating with the last known good price.
+        console.warn(
+          `Failed to update SOL price (status: ${response.status}). Using last known value: $${solPrice}`
+        );
+        // We do not return here, we let the function finish gracefully.
+        return;
+      }
+  
+      const parsedData = await response.json();
+  
+      if (parsedData.solana && parsedData.solana.usd) {
+        // This is the only place the price is successfully updated.
+        const newPrice = parsedData.solana.usd;
+        if (solPrice !== newPrice) {
+            solPrice = newPrice;
+            console.log(`✅ Updated SOL Price: $${solPrice}`);
+        }
+      } else {
+        console.warn("CoinGecko response was OK but data was invalid. Using last known price.");
+      }
+    } catch (error) {
+      // --- RESILIENCE LOGIC ---
+      // If the fetch fails entirely (e.g., DNS error, network timeout), we also fall back
+      // to the last known price instead of crashing or resetting to zero.
+      console.warn(
+        `CRITICAL: API connection to CoinGecko failed. Using last known value: $${solPrice}`
       );
-      return; // Exit the function if the response is not ok
+      console.warn(`Error details: ${error.message}`);
     }
-    const parsedData = await response.json();
-    if (parsedData.solana && parsedData.solana.usd) {
-      solPrice = parsedData.solana.usd;
-      console.log(`Updated SOL Price: $${solPrice}`);
-    } else {
-      console.error("Error: Invalid data structure in CoinGecko response.");
-    }
-  } catch (error) {
-    // Handles network errors, DNS issues, etc.
-    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    console.error("!!! CRITICAL: API CONNECTION FAILED !!!");
-    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    console.error("Failed to fetch SOL price from CoinGecko. Full error details:");
-    console.error("Error Name:", error.name);
-    console.error("Error Message:", error.message);
-    console.error("Error Cause:", error.cause); // This is very helpful!
-    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-}
-}
+  }
 
 /* ---------- Persistence ---------- */
 
