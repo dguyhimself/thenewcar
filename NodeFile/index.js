@@ -822,7 +822,7 @@ async function sendLicenseRequiredMessage(ctx) {
 
   *Ready to dominate the market?*
 
-  [Choose Your Plan](https://snipex.kesug.com/#pricing) | [Contact to Purchase](https://t.me/snipex_mod)  `;
+  [Choose Your Plan](https://snipex.kesug.com/#pricing) | [Contact to Purchase](https://t.me/snipexmod)  `;
   try {
     if (ctx.callbackQuery) {
       await ctx.answerCbQuery("A license is required to use this feature.", {
@@ -1462,7 +1462,7 @@ function buildReferralDashboard(ctx, s) {
 // ADD THIS NEW BUILDER FUNCTION
 function buildUpgradeMenu(s) {
   const currentTier = s.licenseTier || "sniper";
-  const supportUser = "snipex_mod"; // Your support username
+  const supportUser = "snipexmod"; // Your support username
 
   const isCurrent = (tier) =>
     currentTier === tier ? "<b>(Your Current Plan)</b>" : "";
@@ -3202,7 +3202,7 @@ bot.action("menu_help", async (ctx) => {
   <b>5. Need Assistance?</b>
   If you have any questions, encounter technical issues, or require assistance with your license, please contact our dedicated support team.
 
-  <b>Support Contact:</b> @snipex_mod
+  <b>Support Contact:</b> @snipexmod
 
   Use the buttons below to navigate back to the main menu.
     `;
@@ -4805,7 +4805,7 @@ function buildAdvancedSettingsDashboard(s) {
     return dashboard.join("\n");
   }
 function buildFooter() {
-  const supportUser = "snipex_mod"; // Your support username
+  const supportUser = "snipexmod"; // Your support username
   const websiteUrl = "https://snipex.kesug.com"; // Your website
   const botVersion = "v1.8.0"; // Optional: A version number adds professionalism
 
