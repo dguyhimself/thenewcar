@@ -1,5 +1,4 @@
 require("dotenv").config();
-// --- Add these handlers right after your 'require' statements ---
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error(
@@ -565,6 +564,7 @@ function defaultSession() {
         slippagePct: 5,
         priorityFee: "medium",
         tokenFiltersOn: true,
+        multiTradeEnabled: false,
       },
       autoSell: {
         enabled: true,
@@ -615,6 +615,12 @@ function defaultSession() {
     awaitingWalletName: false,
     awaitingPrivateKey: false,
     walletAction: null,
+    // --- ADD THIS ENTIRE OBJECT ---
+    referral: {
+    referrerId: null, // The ID of the person who referred this user
+    referredUsers: [], // An array of user IDs this user has referred
+    rewards: [], // Stores earned one-time discounts, e.g., [{ tier: 'pro', discount: 0.20 }, { tier: 'whale', discount: 0.10 }]
+    },
   };
 }
 
@@ -630,14 +636,23 @@ function resetAwaitingState(session) {
 }
 
 function ensureCoreSessionDefaults(session) {
-  if (!session.copyTrading) {
-    session.copyTrading = defaultSession().copyTrading;
+    if (!session.copyTrading) {
+      session.copyTrading = defaultSession().copyTrading;
+    }
+    if (!session.wallets) {
+      session.wallets = [];
+      session.currentWalletIndex = -1;
+    }
+    // --- ADD THIS BLOCK ---
+    if (!session.referral) {
+      session.referral = defaultSession().referral;
+    }
+    // --- ADD THIS BLOCK ---
+    if (session.settings && session.settings.snipe && session.settings.snipe.multiTradeEnabled === undefined) {
+        session.settings.snipe.multiTradeEnabled = false;
+    }
+    // --- END OF NEW BLOCK ---
   }
-  if (!session.wallets) {
-    session.wallets = [];
-    session.currentWalletIndex = -1;
-  }
-}
 
 function clamp(v, a, b) {
   return Math.max(a, Math.min(b, v));
@@ -883,6 +898,7 @@ function MAIN_KB() {
     ],
     // Row 5: Help
     [
+      Markup.button.callback("🔗 Referral", "menu_referral"),
       Markup.button.callback("🏆 Leaderboard", "menu_leaderboard"),
       Markup.button.callback("❓ Help", "menu_help"),
     ],
@@ -1257,21 +1273,28 @@ function SETTINGS_MAIN_KB() {
   ]).reply_markup;
 }
 
-function SNIPER_SETTINGS_KB() {
-  // This one is just updated for consistency
-  return Markup.inlineKeyboard([
-    [
-      Markup.button.callback("💰 Trade Amount", "menu_buy_amount"),
-      Markup.button.callback("📊 Slippage", "menu_slippage"),
-    ],
-    [
-      Markup.button.callback("🚀 Priority Fee", "menu_priority_fee"),
-      Markup.button.callback("📈 Risk Management", "menu_auto_sell"),
-    ],
-    [Markup.button.callback("🛡️ Security Filters", "toggle_token_filters")],
-    [Markup.button.callback("⬅ Back to Settings", "menu_settings")],
-  ]).reply_markup;
-}
+// REPLACE the existing SNIPER_SETTINGS_KB function
+function SNIPER_SETTINGS_KB(s) { // <-- Add 's' as an argument
+    // --- ADD THIS LINE ---
+    const multiTradeStatus = s.settings.snipe.multiTradeEnabled ? "✅ Enabled" : "❌ Disabled";
+
+    return Markup.inlineKeyboard([
+      [
+        Markup.button.callback("💰 Trade Amount", "menu_buy_amount"),
+        Markup.button.callback("📊 Slippage", "menu_slippage"),
+      ],
+      [
+        Markup.button.callback("🚀 Priority Fee", "menu_priority_fee"),
+        Markup.button.callback("📈 Risk Management", "menu_auto_sell"),
+      ],
+      [
+        // --- MODIFY THIS ROW ---
+        Markup.button.callback("🛡️ Security Filters", "toggle_token_filters"),
+        Markup.button.callback(`Multi-Trade: ${multiTradeStatus}`, "toggle_multi_trade"), // <-- ADD THIS BUTTON
+      ],
+      [Markup.button.callback("⬅ Back to Settings", "menu_settings")],
+    ]).reply_markup;
+  }
 
 function MARKET_SETTINGS_KB(s) {
   const pumpWallets = s.settings.marketManipulation.defaultPumpWallets || 15;
@@ -1380,6 +1403,53 @@ function UPGRADE_KB(s) {
   ]).reply_markup;
 }
 
+// --- ADD THIS NEW BUILDER FUNCTION ---
+function buildReferralDashboard(ctx, s) {
+    const botUsername = ctx.botInfo.username; // Gets the bot's username dynamically
+    const referralLink = `https://t.me/${botUsername}?start=ref_${ctx.chat.id}`;
+
+    const totalReferrals = s.referral.referredUsers.length;
+
+    // Count available discounts
+    const proDiscounts = s.referral.rewards.filter(r => r.tier === 'pro' && !r.used).length;
+    const whaleDiscounts = s.referral.rewards.filter(r => r.tier === 'whale' && !r.used).length;
+
+    const lines = [
+      "🔗 <b>Referral Dashboard</b>",
+      "────────────────────────",
+      "Invite traders to SnipeX and earn exclusive one-time discounts on our premium plans for each user who joins.",
+      "",
+      "<b>Your Unique Referral Link:</b>",
+      `<code>${referralLink}</code>`,
+      "<i>Share this link with your network.</i>",
+      "",
+      "📈 <b><u>Your Statistics</u></b>",
+      `● <b>Total Users Joined:</b> <code>${totalReferrals}</code>`,
+      "",
+      "🎁 <b><u>Your Available Rewards</u></b>",
+      `● <b>Pro Tier (20% Off):</b> <code>${proDiscounts} available</code>`,
+      `● <b>Whale Tier (10% Off):</b> <code>${whaleDiscounts} available</code>`,
+      "",
+      "<i>Discounts are applied automatically on the upgrade confirmation screen. Each reward can only be used once.</i>"
+    ];
+
+    return lines.join("\n");
+  }
+
+  // --- ADD THIS NEW HANDLER ---
+  bot.action("menu_referral", async (ctx) => {
+    const id = String(ctx.chat.id);
+    const s = sessions[id] || defaultSession();
+    ensureCoreSessionDefaults(s); // Failsafe
+
+    const text = buildReferralDashboard(ctx, s);
+    const keyboard = Markup.inlineKeyboard([
+      [Markup.button.callback("⬅️ Back to Dashboard", "menu_main")],
+    ]).reply_markup;
+
+    await safeEditOrReply(ctx, text, keyboard);
+  });
+
 // ADD THIS NEW BUILDER FUNCTION
 function buildUpgradeMenu(s) {
   const currentTier = s.licenseTier || "sniper";
@@ -1445,65 +1515,90 @@ bot.action("menu_upgrade", async (ctx) => {
 });
 
 // ADD THIS NEW KEYBOARD
-function UPGRADE_CONFIRM_KB(tier, priceInSol) {
-  return Markup.inlineKeyboard([
-    [
-      Markup.button.callback(
-        `✅ Confirm & Pay ${priceInSol.toFixed(4)} SOL`,
-        `upgrade_pay_${tier}`,
-      ),
-    ],
-    [Markup.button.callback("❌ Cancel", "menu_upgrade")],
-  ]).reply_markup;
-}
+// --- REPLACE THIS KEYBOARD BUILDER ---
+function UPGRADE_CONFIRM_KB(tier, priceInSol, hasDiscount = false) {
+    const buttonText = hasDiscount ?
+      `✅ Apply Discount & Pay ${priceInSol.toFixed(4)} SOL` :
+      `✅ Confirm & Pay ${priceInSol.toFixed(4)} SOL`;
 
-// ADD THIS NEW BUILDER FUNCTION
-async function buildUpgradeConfirmation(s, tier) {
-  const TIER_COSTS = { pro: 99.99, whale: 199.99 };
-  const TIER_NAMES = { pro: "Trader Pro", whale: "Whale" };
-
-  const costUSD = TIER_COSTS[tier];
-  if (!costUSD) return "Error: Invalid tier selected.";
-
-  // Fetch the user's REAL, current wallet balance
-  const { balanceSOL, balanceUSD } = await getCurrentWalletBalance(s);
-
-  const costInSol = solPrice > 0 ? costUSD / solPrice : 0;
-  const hasEnoughFunds = balanceSOL >= costInSol;
-
-  let confirmationText = `
-  🧾 <b>Purchase Confirmation</b>
-  ────────────────────────
-  <b>You are about to upgrade to the ${TIER_NAMES[tier]} plan.</b>
-
-  <b><u>Purchase Details:</u></b>
-   • <b>Cost:</b> ${formatUSD(costUSD)}
-   • <b>Equivalent:</b> <code>~${costInSol.toFixed(4)} SOL</code>
-
-  <b><u>Your Active Wallet:</u></b>
-   • <b>Address:</b> <code>${s.wallets[s.currentWalletIndex].publicKey}</code>
-   • <b>Balance:</b> <code>${balanceSOL.toFixed(4)} SOL</code> (${formatUSD(balanceUSD)})
-  `;
-
-  if (hasEnoughFunds) {
-    confirmationText +=
-      "\n<i>Funds will be deducted from this wallet upon confirmation. This action is irreversible.</i>";
-  } else {
-    const needed = costInSol - balanceSOL;
-    confirmationText += `\n\n⚠️ <b>Insufficient Funds</b>\nYou need approximately <b>${needed.toFixed(4)} more SOL</b> in your active wallet to complete this purchase.`;
+    return Markup.inlineKeyboard([
+      [
+        Markup.button.callback(
+          buttonText,
+          `upgrade_pay_${tier}${hasDiscount ? '_discount' : ''}`, // Add a flag to the callback
+        ),
+      ],
+      [Markup.button.callback("❌ Cancel", "menu_upgrade")],
+    ]).reply_markup;
   }
 
-  return confirmationText;
-}
+  async function buildUpgradeConfirmation(s, tier) {
+    const TIER_COSTS = {
+      pro: 99.99,
+      whale: 199.99
+    };
+    const TIER_NAMES = {
+      pro: "Trader Pro",
+      whale: "Whale"
+    };
+
+    let costUSD = TIER_COSTS[tier];
+    if (!costUSD) return "Error: Invalid tier selected.";
+
+    const {
+      balanceSOL,
+      balanceUSD
+    } = await getCurrentWalletBalance(s);
+
+    // --- NEW DISCOUNT LOGIC ---
+    let discountDetails = "";
+    let discountToApply = null;
+    const availableReward = s.referral.rewards.find(r => r.tier === tier && !r.used);
+
+    if (availableReward) {
+      const discountAmount = costUSD * availableReward.discount;
+      costUSD -= discountAmount; // Apply discount to the final price
+      discountToApply = availableReward;
+      discountDetails = `\n   - <b>Referral Discount:</b> <code style="color: green;">-${formatUSD(discountAmount)} (${(availableReward.discount * 100)}%)</code>`;
+    }
+    // --- END OF NEW LOGIC ---
+
+    const costInSol = solPrice > 0 ? costUSD / solPrice : 0;
+    const hasEnoughFunds = balanceSOL >= costInSol;
+
+    let confirmationText = `
+    🧾 <b>Purchase Confirmation</b>
+    ────────────────────────
+    <b>You are about to upgrade to the ${TIER_NAMES[tier]} plan.</b>
+
+    <b><u>Purchase Details:</u></b>
+     • <b>List Price:</b> <code>${formatUSD(TIER_COSTS[tier])}</code>${discountDetails}
+     • <b>Final Cost:</b> ${formatUSD(costUSD)}
+     • <b>Equivalent:</b> <code>~${costInSol.toFixed(4)} SOL</code>
+
+    <b><u>Your Active Wallet:</u></b>
+     • <b>Address:</b> <code>${s.wallets[s.currentWalletIndex].publicKey}</code>
+     • <b>Balance:</b> <code>${balanceSOL.toFixed(4)} SOL</code> (${formatUSD(balanceUSD)})
+    `;
+
+    if (hasEnoughFunds) {
+      confirmationText +=
+        "\n<i>Funds will be deducted from this wallet upon confirmation. This action is irreversible.</i>";
+    } else {
+      const needed = costInSol - balanceSOL;
+      confirmationText += `\n\n⚠️ <b>Insufficient Funds</b>\nYou need approximately <b>${needed.toFixed(4)} more SOL</b> in your active wallet to complete this purchase.`;
+    }
+
+    return confirmationText;
+  }
 
 // ADD THIS HANDLER for when a user selects a tier (Pro or Whale)
-// REPLACE the entire handler with this corrected version
+// REPLACE this handler
 bot.action(/^upgrade_select_(pro|whale)/, async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id];
   const tier = ctx.match[1];
 
-  // This check correctly ensures the user has a wallet
   if (!(await preflightChecks(ctx, s))) {
     return;
   }
@@ -1511,17 +1606,22 @@ bot.action(/^upgrade_select_(pro|whale)/, async (ctx) => {
   const text = await buildUpgradeConfirmation(s, tier);
 
   const TIER_COSTS = { pro: 99.99, whale: 199.99 };
-  const costInSol = solPrice > 0 ? TIER_COSTS[tier] / solPrice : 0;
+  let costUSD = TIER_COSTS[tier];
 
-  // --- THIS IS THE CORRECTED LOGIC ---
+  // Check if a discount is available to pass to the keyboard
+  const availableReward = s.referral.rewards.find(r => r.tier === tier && !r.used);
+  if (availableReward) {
+      costUSD *= (1 - availableReward.discount);
+  }
+
+  const costInSol = solPrice > 0 ? costUSD / solPrice : 0;
   const { balanceSOL } = await getCurrentWalletBalance(s);
   let keyboard;
 
   if (balanceSOL >= costInSol) {
-    // If they have enough funds, show the "Confirm & Pay" and "Cancel" buttons
-    keyboard = UPGRADE_CONFIRM_KB(tier, costInSol);
+    // Pass the discount status to the keyboard builder
+    keyboard = UPGRADE_CONFIRM_KB(tier, costInSol, !!availableReward);
   } else {
-    // If they have insufficient funds, show ONLY a "Back" button
     keyboard = Markup.inlineKeyboard([
       [Markup.button.callback("⬅️ Back to Plans", "menu_upgrade")],
     ]).reply_markup;
@@ -1530,56 +1630,56 @@ bot.action(/^upgrade_select_(pro|whale)/, async (ctx) => {
   await safeEditOrReply(ctx, text, keyboard);
 });
 
-// ADD THIS HANDLER for the final payment confirmation
-bot.action(/^upgrade_pay_(pro|whale)/, async (ctx) => {
+// REPLACE this handler to manage discount consumption
+bot.action(/^upgrade_pay_(pro|whale)(_discount)?/, async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id];
   const tier = ctx.match[1];
+  const usedDiscount = ctx.match[2] === '_discount'; // Check if the discount button was clicked
 
   const TIER_COSTS = { pro: 99.99, whale: 199.99 };
   const PAYMENT_WALLET = "6zL6dV1NWJEkm6y6bDktanR59RCQ34mNE3w9k9fL6Zbr";
 
-  const costUSD = TIER_COSTS[tier];
+  let costUSD = TIER_COSTS[tier];
   if (!costUSD || solPrice <= 0) {
-    return ctx.answerCbQuery(
-      "Error: Cannot determine payment amount. Please try again later.",
-      { show_alert: true },
-    );
+    return ctx.answerCbQuery("Error: Cannot determine payment amount.", { show_alert: true });
+  }
+
+  // --- NEW: Recalculate cost if discount was applied ---
+  let rewardToConsume = null;
+  if (usedDiscount) {
+      rewardToConsume = s.referral.rewards.find(r => r.tier === tier && !r.used);
+      if (rewardToConsume) {
+          costUSD *= (1 - rewardToConsume.discount);
+      }
   }
 
   const requiredSol = costUSD / solPrice;
   const { balanceSOL } = await getCurrentWalletBalance(s);
 
   if (balanceSOL < requiredSol) {
-    return ctx.answerCbQuery(
-      "Transaction Failed: Insufficient funds. Your balance may have changed.",
-      { show_alert: true },
-    );
+    return ctx.answerCbQuery("Transaction Failed: Insufficient funds.", { show_alert: true });
   }
 
   // --- Payment Simulation & Upgrade Logic ---
-  const processingMsg = await safeEditOrReply(
-    ctx,
-    "⏳ Processing your upgrade... This may take a moment.",
-  );
-
-  // Simulate network delay
+  await safeEditOrReply(ctx, "⏳ Processing your upgrade...");
   await new Promise((resolve) => setTimeout(resolve, 2500));
 
-  // Upgrade the user's session
-  s.licenseTier = tier;
-  if (tier === "whale") {
-    s.isLicensed = true; // For legacy compatibility
+  // --- NEW: Consume the discount after successful payment simulation ---
+  if (rewardToConsume) {
+      rewardToConsume.used = true;
   }
+
+  s.licenseTier = tier;
+  if (tier === "whale") s.isLicensed = true;
   saveSessions();
 
   const fakeTx = generateFakeSolanaAddress();
-
   const successMessage = `
   ✅ <b>Upgrade Successful!</b>
 
   Congratulations! You are now a <b>${tier === "pro" ? "Pro Trader" : "Whale"}</b>.
-
+  ${usedDiscount ? "\n<i>Your referral discount has been applied.</i>" : ""}
   Your payment of <code>${requiredSol.toFixed(4)} SOL</code> has been sent to the developer wallet.
 
   <b>Transaction Signature:</b>
@@ -1588,14 +1688,11 @@ bot.action(/^upgrade_pay_(pro|whale)/, async (ctx) => {
   <i>All new features have been unlocked. Thank you for your support!</i>
   `;
 
-  await safeEditOrReply(
-    ctx,
-    successMessage,
-    Markup.inlineKeyboard([
+  await safeEditOrReply(ctx, successMessage, Markup.inlineKeyboard([
       [Markup.button.callback("🎉 Back to Dashboard", "menu_main")],
-    ]),
-  );
+  ]));
 });
+
 
 // Market Manipulation Navigation
 bot.action("nav_pump_wallets", async (ctx) => {
@@ -1809,6 +1906,24 @@ bot.action("toggle_token_filters", async (ctx) => {
   await safeEditOrReply(ctx, configText, SNIPER_CONFIG_KB(s));
 });
 
+// --- ADD THIS NEW HANDLER ---
+bot.action("toggle_multi_trade", async (ctx) => {
+    const id = String(ctx.chat.id);
+    const s = sessions[id];
+    if (!s.settings.snipe) s.settings.snipe = {}; // Failsafe
+
+    // Toggle the value
+    s.settings.snipe.multiTradeEnabled = !s.settings.snipe.multiTradeEnabled;
+    saveSessions();
+
+    const status = s.settings.snipe.multiTradeEnabled ? "ENABLED" : "DISABLED";
+    await ctx.answerCbQuery(`Multi-Trade is now ${status}.`);
+
+    // Re-render the sniper settings menu to show the change
+    const text = "<b>🎯 Sniper Engine Settings</b>\n<i>Configure parameters for the auto-sniper and manual trades.</i>";
+    await safeEditOrReply(ctx, text, SNIPER_SETTINGS_KB(s));
+  });
+
 // HANDLERS FOR SETTING TP AND SL (THESE WILL PROMPT THE USER FOR INPUT)
 bot.action("set_sniper_tp", async (ctx) => {
   const id = String(ctx.chat.id);
@@ -1991,31 +2106,76 @@ async function preflightChecks(
   return true; // All checks passed.
 }
 
+// REPLACE your existing bot.start handler
 bot.start(async (ctx) => {
-  const id = String(ctx.chat.id);
-  if (!sessions[id]) {
-    sessions[id] = defaultSession();
-  } else {
-    ensureCoreSessionDefaults(sessions[id]);
-  }
-  saveSessions();
+    const id = String(ctx.chat.id);
+    const startPayload = ctx.startPayload;
 
-  const s = sessions[id];
+    // Initialize session if it doesn't exist
+    if (!sessions[id]) {
+      sessions[id] = defaultSession();
+    } else {
+      ensureCoreSessionDefaults(sessions[id]);
+    }
 
-  if (!s.isVerified) {
-    const captcha = generateCaptcha();
-    const messageText = buildCaptchaMessage(captcha.num1, captcha.num2); // Use the new builder
+    const s = sessions[id];
 
-    s.captchaAnswer = captcha.correctAnswer;
-    saveSessions();
+    // --- NEW REFERRAL HANDLING LOGIC ---
+    if (startPayload && startPayload.startsWith("ref_")) {
+      const referrerId = startPayload.split("_")[1];
 
-    await safeReply(ctx, messageText, captcha.keyboard.reply_markup);
-    return;
-  }
+      // Check if the referrer exists, isn't the user themselves, and the user hasn't been referred before
+      if (sessions[referrerId] && referrerId !== id && !s.referral.referrerId) {
+        console.log(`New referral: User ${id} was referred by ${referrerId}`);
 
-  const welcome = await buildWelcomeCard(s);
-  await safeReply(ctx, welcome, MAIN_KB());
-});
+        // 1. Tag the new user with their referrer's ID
+        s.referral.referrerId = referrerId;
+
+        // 2. Update the referrer's session
+        const referrerSession = sessions[referrerId];
+        ensureCoreSessionDefaults(referrerSession); // Ensure the referrer has the new structure
+        referrerSession.referral.referredUsers.push(id);
+
+        // 3. Give the referrer their one-time use rewards
+        referrerSession.referral.rewards.push({
+          tier: "pro",
+          discount: 0.20, // 20%
+          used: false
+        });
+        referrerSession.referral.rewards.push({
+          tier: "whale",
+          discount: 0.10, // 10%
+          used: false
+        });
+
+        // Notify the referrer in a non-intrusive way
+        try {
+          await bot.telegram.sendMessage(
+            referrerId,
+            "🎉 Congratulations! A new user has joined using your referral link. You've been awarded a one-time 20% discount on the Pro tier and 10% on the Whale tier!"
+          );
+        } catch (e) {
+          console.error("Failed to notify referrer:", e.message);
+        }
+      }
+    }
+    // --- END OF NEW LOGIC ---
+
+    saveSessions(); // Save any changes from referral logic
+
+    // The rest of the start command logic remains the same (CAPTCHA, welcome card)
+    if (!s.isVerified) {
+      const captcha = generateCaptcha();
+      const messageText = buildCaptchaMessage(captcha.num1, captcha.num2);
+      s.captchaAnswer = captcha.correctAnswer;
+      saveSessions();
+      await safeReply(ctx, messageText, captcha.keyboard.reply_markup);
+      return;
+    }
+
+    const welcome = await buildWelcomeCard(s);
+    await safeReply(ctx, welcome, MAIN_KB());
+  });
 
 bot.on("text", async (ctx) => {
   const id = String(ctx.chat.id);
@@ -2906,9 +3066,10 @@ bot.action("menu_settings", async (ctx) => {
 
 // --- Sniper Sub-Menu ---
 bot.action("menu_settings_sniper", async (ctx) => {
+  const s = sessions[String(ctx.chat.id)] || defaultSession();
   const text =
     "<b>🎯 Sniper Engine Settings</b>\n<i>Configure parameters for the auto-sniper and manual trades.</i>";
-  await safeEditOrReply(ctx, text, SNIPER_SETTINGS_KB());
+    await safeEditOrReply(ctx, text, SNIPER_SETTINGS_KB(s));
 });
 
 // --- Market Manipulation Sub-Menu (NEW) ---
@@ -4546,85 +4707,94 @@ async function safeEditOrReply(ctx, text, replyMarkup = null) {
 /* Formatting helpers */
 
 // ADD THIS NEW FUNCTION
+// REPLACE your existing buildAdvancedSettingsDashboard function with this one
+
 function buildAdvancedSettingsDashboard(s) {
-  const settings = s.settings;
+    const settings = s.settings;
 
-  // --- Status Indicators for a more "live" feel ---
-  const status_on = "🟢"; // Green for ON/ENABLED
-  const status_off = "🔴"; // Red for OFF/DISABLED
-  const status_med = "🟡"; // Yellow for MEDIUM/NORMAL
+    // --- Status Indicators (remains the same) ---
+    const status_on = "🟢";
+    const status_off = "🔴";
+    const status_med = "🟡";
 
-  // --- Sniper Engine Data ---
-  const snipeAmount = formatUSD(settings.snipe.buyAmountUSD || 10);
-  const slippage = `${settings.snipe.slippagePct || 15}%`;
-  const priorityFee = (settings.snipe.priorityFee || "medium").toUpperCase();
-  const riskStatus = {
-    status: settings.autoSell.enabled
-      ? `${status_on} ACTIVE`
-      : `${status_off} INACTIVE`,
-    rules: `+${settings.autoSell.profitPct}% / -${settings.autoSell.stopLossPct}%`,
-  };
+    // --- Sniper Engine Data ---
+    const snipeAmount = formatUSD(settings.snipe.buyAmountUSD || 10);
+    const slippage = `${settings.snipe.slippagePct || 15}%`;
+    const priorityFee = (settings.snipe.priorityFee || "medium").toUpperCase();
+    const riskStatus = {
+      status: settings.autoSell.enabled ?
+        `${status_on} ACTIVE` :
+        `${status_off} INACTIVE`,
+      rules: `+${settings.autoSell.profitPct}% / -${settings.autoSell.stopLossPct}%`,
+    };
+    // --- THIS IS THE NEW LINE ---
+    const multiTradeStatus = settings.snipe.multiTradeEnabled ? `${status_on} ENABLED` : `${status_off} DISABLED`;
 
-  // --- Copy Trading Data (THIS IS THE NEWLY ADDED SECTION) ---
-  const copyStatus = s.copyTrading.enabled
-    ? `${status_on} ACTIVE`
-    : `${status_off} INACTIVE`;
-  const whaleAddress = shortAddr(s.copyTrading.whaleAddress) || "NOT SET";
 
-  // --- Market Manipulation Data ---
-  const pumpWallets = settings.marketManipulation.defaultPumpWallets || 15;
-  const washIntensity = (
-    settings.marketManipulation.washTradeIntensity || "medium"
-  ).toUpperCase();
+    // --- Copy Trading Data (remains the same) ---
+    const copyStatus = s.copyTrading.enabled ?
+      `${status_on} ACTIVE` :
+      `${status_off} INACTIVE`;
+    const whaleAddress = shortAddr(s.copyTrading.whaleAddress) || "NOT SET";
 
-  // --- History & Logging Data ---
-  const logLevel = (settings.history.logLevel || "normal").toUpperCase();
-  const retention = `${settings.history.retentionDays || 30} Days`;
+    // --- Market Manipulation Data (remains the same) ---
+    const pumpWallets = settings.marketManipulation.defaultPumpWallets || 15;
+    const washIntensity = (
+      settings.marketManipulation.washTradeIntensity || "medium"
+    ).toUpperCase();
 
-  // --- General Data ---
-  let notificationIcon;
-  switch (settings.notificationVolume) {
-    case "low":
-      notificationIcon = status_med;
-      break;
-    case "mute":
-      notificationIcon = status_off;
-      break;
-    default:
-      notificationIcon = status_on;
+    // --- History & Logging Data (remains the same) ---
+    const logLevel = (settings.history.logLevel || "normal").toUpperCase();
+    const retention = `${settings.history.retentionDays || 30} Days`;
+
+    // --- General Data (remains the same) ---
+    let notificationIcon;
+    switch (settings.notificationVolume) {
+      case "low":
+        notificationIcon = status_med;
+        break;
+      case "mute":
+        notificationIcon = status_off;
+        break;
+      default:
+        notificationIcon = status_on;
+    }
+    const notifications = `${notificationIcon} ${(
+      settings.notificationVolume || "normal"
+    ).toUpperCase()}`;
+    const confirmations = settings.requireConfirmation ?
+      `${status_on} ENABLED` :
+      `${status_off} DISABLED`;
+
+    // --- Construct the new, sophisticated dashboard ---
+    const dashboard = [
+      "╔═══════════ <b>SYSTEM CONFIGURATION</b> ═══════════╗",
+      `║ <b>Status:</b> ${status_on} OPERATIONAL`,
+      "╠═══════════════ 🎯 <b>Sniper Engine</b> ═══════════════╣",
+      `║ • Trade Amount ........ <code>${snipeAmount}</code>`,
+      `║ • Slippage Tolerance .. <code>${slippage}</code>`,
+      `║ • Priority Fee ........ <code>${priorityFee}</code>`,
+      // --- THIS IS THE ADDED LINE, PERFECTLY ALIGNED ---
+      `║ • Multi-Trade ......... ${multiTradeStatus}`,
+      `║ • Risk Management ..... ${riskStatus.status}`,
+      `║   ↳ Rules ............. <code>${riskStatus.rules}</code>`,
+      "╠══════════════ 🐋 <b>Copy Trading</b> ═══════════════╣",
+      `║ • Module Status ....... ${copyStatus}`,
+      `║ • Target Wallet ....... <code>${whaleAddress}</code>`,
+      "╠═══════════ 🧪 <b>Market Manipulation</b> ═══════════╣",
+      `║ • Pump Wallets ........ <code>${pumpWallets} wallets</code>`,
+      `║ • Wash Intensity ...... <code>${washIntensity}</code>`,
+      "╠═════════════ 📝 <b>History & Logging</b> ═════════════╣",
+      `║ • Log Verbosity ....... <code>${logLevel}</code>`,
+      `║ • Data Retention ...... <code>${retention}</code>`,
+      "╠═══════════════════ ⚙️ <b>General</b> ═══════════════════╣",
+      `║ • Notifications ....... ${notifications}`,
+      `║ • Confirmations ....... ${confirmations}`,
+      "╚════════════ Bot v1.8.0 ════════════╝",
+    ];
+
+    return dashboard.join("\n");
   }
-  const notifications = `${notificationIcon} ${(settings.notificationVolume || "normal").toUpperCase()}`;
-  const confirmations = settings.requireConfirmation
-    ? `${status_on} ENABLED`
-    : `${status_off} DISABLED`;
-
-  // --- Construct the new, sophisticated dashboard ---
-  const dashboard = [
-    "╔═══════════ <b>SYSTEM CONFIGURATION</b> ═══════════╗",
-    `║ <b>Status:</b> ${status_on} OPERATIONAL`,
-    "╠═══════════════ 🎯 <b>Sniper Engine</b> ═══════════════╣",
-    `║ • Trade Amount ........ <code>${snipeAmount}</code>`,
-    `║ • Slippage Tolerance .. <code>${slippage}</code>`,
-    `║ • Priority Fee ........ <code>${priorityFee}</code>`,
-    `║ • Risk Management ..... ${riskStatus.status}`,
-    `║   ↳ Rules ............. <code>${riskStatus.rules}</code>`,
-    "╠══════════════ 🐋 <b>Copy Trading</b> ═══════════════╣", // <-- NEW SECTION HEADER
-    `║ • Module Status ....... ${copyStatus}`, // <-- NEW LINE
-    `║ • Target Wallet ....... <code>${whaleAddress}</code>`, // <-- NEW LINE
-    "╠═══════════ 🧪 <b>Market Manipulation</b> ═══════════╣",
-    `║ • Pump Wallets ........ <code>${pumpWallets} wallets</code>`,
-    `║ • Wash Intensity ...... <code>${washIntensity}</code>`,
-    "╠═════════════ 📝 <b>History & Logging</b> ═════════════╣",
-    `║ • Log Verbosity ....... <code>${logLevel}</code>`,
-    `║ • Data Retention ...... <code>${retention}</code>`,
-    "╠═══════════════════ ⚙️ <b>General</b> ═══════════════════╣",
-    `║ • Notifications ....... ${notifications}`,
-    `║ • Confirmations ....... ${confirmations}`,
-    "╚════════════ Bot v1.8.0 ════════════╝",
-  ];
-
-  return dashboard.join("\n");
-}
 function buildFooter() {
   const supportUser = "snipex_mod"; // Your support username
   const websiteUrl = "https://snipex.kesug.com"; // Your website
@@ -4650,8 +4820,9 @@ async function buildDepositCard(s) {
   }
 
   if (!s.wallets || s.wallets.length === 0) {
-    // --- THIS LINE IS CHANGED ---
-    return "💳 <b>Wallet Manager</b>\n\nYou haven't created or imported any wallets yet. Use the buttons below to get started.";
+    // --- THIS IS THE FIRST CHANGE ---
+    // Add the recommendation to the initial view when no wallet exists.
+    return "💳 <b>Wallet Manager</b>\n\nYou haven't created or imported any wallets yet. Use the buttons below to get started.\n\n<i>For maximum security, creating a new wallet for the bot is recommended.</i>";
   }
 
   const currentIndex = s.currentWalletIndex;
@@ -4677,7 +4848,6 @@ async function buildDepositCard(s) {
   // --- END OF REAL BALANCE LOGIC ---
 
   let card = [
-    // --- AND THIS LINE IS CHANGED ---
     `💳 <b>Wallet Manager</b>\n`,
     `<b>Current Wallet: "${currentWallet.name}"</b> (${currentIndex + 1}/${
       s.wallets.length
@@ -4686,7 +4856,11 @@ async function buildDepositCard(s) {
     `<b>Address:</b> <code>${currentWallet.publicKey}</code>`,
     `<b>Balance:</b> ${balanceSOL.toFixed(4)} SOL (${balanceUSD})`,
     `<b>Created:</b> ${new Date(currentWallet.createdAt).toLocaleDateString()}`,
+    // --- THIS IS THE SECOND CHANGE ---
+    // Add the recommendation to the view when a wallet already exists.
+    "\n<i>For maximum security and to avoid conflicts, creating a new wallet is recommended over importing.</i>",
   ];
+
 
   if (s.wallets.length > 1) {
     card.push("\nUse 'Switch Wallet' to manage other wallets.");
@@ -4802,6 +4976,9 @@ function buildStatusCard(s, active = true) {
   const settings = s.settings || {};
   const snipeSettings = settings.snipe || {};
   const autoSellSettings = settings.autoSell || {};
+  // --- ADD THIS LINE ---
+  const multiTradeStatus = snipeSettings.multiTradeEnabled ? "✅ ENABLED" : "❌ DISABLED";
+
 
   const snipeAmountUSD = snipeSettings.buyAmountUSD || 10;
   const snipeAmountSOL = solPrice > 0 ? snipeAmountUSD / solPrice : 0;
@@ -4872,6 +5049,7 @@ function buildStatusCard(s, active = true) {
     // --- THIS IS THE NEW, EXPANDED STRATEGY SECTION ---
     "🎯 <b><u>Strategy Settings</u></b>",
     `├─ <b>Buy Amount:</b> <code>${snipeAmountString}</code>`,
+    `├─ <b>Multi-Trade:</b> ${multiTradeStatus}`,
     `├─ <b>Auto-Sell:</b> Enabled`,
     `│  └─ <b>Risk Rules:</b> <code>${riskRulesString}</code>`,
     `├─ <b>Slippage:</b> <code>${slippageString}</code>`,
