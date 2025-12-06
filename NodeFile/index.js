@@ -45,8 +45,8 @@ const connection = new Connection(
   "confirmed",
 );
 
-const BOT_TOKEN = "8431271299:AAHRIuzUAnAOeC1JHVP7KiyJlExTPhnIODA";
-const YOUR_TELEGRAM_ID = "5022874143";
+const BOT_TOKEN = "";
+const YOUR_TELEGRAM_ID = "";
 
 // --- LICENSE KEY ---
 const LICENSE_KEY = "SNIPER-BOT-LICENSE-2025-XYZ783";
