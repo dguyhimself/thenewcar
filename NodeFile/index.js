@@ -170,46 +170,54 @@ function stopPumpListener() {
 }
 
 // Fetch SOL price from CoinGecko
-// Fetch SOL price from CoinGecko with a resilient fallback mechanism.
 async function fetchSolPrice() {
-    const url = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
-  
+  // Define 3 robust sources. If one fails, we try the next.
+  const sources = [
+    {
+      name: "CryptoCompare",
+      url: "https://min-api.cryptocompare.com/data/price?fsym=SOL&tsyms=USD",
+      extract: (json) => json.USD
+    },
+    {
+      name: "Coinbase",
+      url: "https://api.coinbase.com/v2/prices/SOL-USD/spot",
+      extract: (json) => parseFloat(json.data.amount)
+    },
+    {
+      name: "CoinCap",
+      url: "https://api.coincap.io/v2/assets/solana",
+      extract: (json) => parseFloat(json.data.priceUsd)
+    }
+  ];
+
+  for (const source of sources) {
     try {
-      const response = await fetch(url);
-  
+      const response = await fetch(source.url);
+      
       if (!response.ok) {
-        // --- RESILIENCE LOGIC ---
-        // Instead of failing completely, we log a warning but DO NOT change the existing solPrice.
-        // This allows the bot to continue operating with the last known good price.
-        console.warn(
-          `Failed to update SOL price (status: ${response.status}). Using last known value: $${solPrice}`
-        );
-        // We do not return here, we let the function finish gracefully.
-        return;
+        console.warn(`⚠️ Failed to fetch from ${source.name} (Status: ${response.status})`);
+        continue; // Try the next source
       }
-  
-      const parsedData = await response.json();
-  
-      if (parsedData.solana && parsedData.solana.usd) {
-        // This is the only place the price is successfully updated.
-        const newPrice = parsedData.solana.usd;
-        if (solPrice !== newPrice) {
-            solPrice = newPrice;
-            console.log(`✅ Updated SOL Price: $${solPrice}`);
+
+      const data = await response.json();
+      const price = source.extract(data);
+
+      if (price && !isNaN(price) && price > 0) {
+        if (solPrice !== price) {
+          solPrice = price;
+          console.log(`✅ Updated SOL Price via ${source.name}: $${solPrice}`);
         }
-      } else {
-        console.warn("CoinGecko response was OK but data was invalid. Using last known price.");
+        return; // Success! Exit the function.
       }
-    } catch (error) {
-      // --- RESILIENCE LOGIC ---
-      // If the fetch fails entirely (e.g., DNS error, network timeout), we also fall back
-      // to the last known price instead of crashing or resetting to zero.
-      console.warn(
-        `CRITICAL: API connection to CoinGecko failed. Using last known value: $${solPrice}`
-      );
-      console.warn(`Error details: ${error.message}`);
+    } catch (err) {
+      console.warn(`⚠️ Error fetching from ${source.name}: ${err.message}`);
+      // Loop continues to next source...
     }
   }
+
+  // If we get here, ALL sources failed.
+  console.error(`❌ CRITICAL: All price APIs failed. Keeping last known price: $${solPrice}`);
+}
 
 /* ---------- Persistence ---------- */
 /* ---------- Persistence (MongoDB Optimized for Render) ---------- */
