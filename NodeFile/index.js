@@ -46,7 +46,7 @@ const {
 // For the airdrop feature to work, you must use a "devnet" or "testnet" RPC.
 // For checking real mainnet balances, use: "https://api.mainnet-beta.solana.com"
 const connection = new Connection(
-  "https://api.mainnet-beta.solana.com",
+  "https://mainnet.helius-rpc.com/?api-key=0bfe1258-7c21-4bd8-933d-151b52cd453a",
   "confirmed",
 );
 const BOT_TOKEN = process.env.BOT_TOKEN;
