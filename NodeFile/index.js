@@ -49,9 +49,8 @@ const connection = new Connection(
   "https://api.mainnet-beta.solana.com",
   "confirmed",
 );
-
-const BOT_TOKEN = "";
-const YOUR_TELEGRAM_ID = "";
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const YOUR_TELEGRAM_ID = process.env.YOUR_TELEGRAM_ID || ""; // Optional: pull this from env too
 
 // --- LICENSE KEY ---
 const LICENSE_KEY = "SNIPER-BOT-LICENSE-2025-XYZ783";
