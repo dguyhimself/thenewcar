@@ -1,5 +1,10 @@
 require("dotenv").config();
 
+// OVERRIDE: Silence all standard console logs to save CPU cycles on Render Free.
+// Errors and Warnings will still print.
+console.log = function() {};
+console.info = function() {};
+
 process.on("unhandledRejection", (reason, promise) => {
   console.error(
     "CRITICAL: Unhandled Rejection at:",
@@ -208,51 +213,99 @@ async function fetchSolPrice() {
   }
 
 /* ---------- Persistence ---------- */
+/* ---------- Persistence (MongoDB Optimized for Render) ---------- */
+const { MongoClient } = require('mongodb');
 
-function loadDataFromFile(filePath) {
-  try {
-    if (fs.existsSync(filePath)) {
-      const rawData = fs.readFileSync(filePath, "utf8");
-      return JSON.parse(rawData);
-    }
-  } catch (e) {
-    console.error(`Failed to load data from ${filePath}:`, e);
-  }
-  return {};
+// Fetches the URI from Render's Environment Variables
+const MONGO_URI = process.env.MONGO_URI; 
+if (!MONGO_URI) {
+  console.error("CRITICAL: MONGO_URI is not defined in environment variables.");
+  process.exit(1); 
 }
 
-function saveDataToFile(filePath, data) {
-  const tempFilePath = filePath + ".tmp";
+const client = new MongoClient(MONGO_URI);
+let db;
+
+// In-memory sessions and intervals (Keep these here)
+const wallets = {}; 
+
+async function initDB() {
   try {
-    // 1. Write the new data to a temporary file.
-    fs.writeFileSync(tempFilePath, JSON.stringify(data, null, 2), "utf8");
-    // 2. If the write is successful, rename the temp file to the original file name.
-    // This is an atomic operation on most systems and prevents corruption.
-    fs.renameSync(tempFilePath, filePath);
-  } catch (e) {
-    console.error(`CRITICAL: Failed to save data to ${filePath}:`, e);
-    // If something went wrong, try to clean up the temporary file.
-    if (fs.existsSync(tempFilePath)) {
-      fs.unlinkSync(tempFilePath);
+    await client.connect();
+    db = client.db('snipex_bot');
+    console.log("✅ Connected to MongoDB");
+
+    // Load Sessions
+    const savedSessions = await db.collection('storage').findOne({ _id: 'sessions' });
+    if (savedSessions && savedSessions.data) {
+      Object.assign(sessions, savedSessions.data);
     }
+
+    // Load Wallets
+    const savedWallets = await db.collection('storage').findOne({ _id: 'wallets' });
+    if (savedWallets && savedWallets.data) {
+      Object.assign(wallets, savedWallets.data);
+    }
+
+    console.log(`Loaded ${Object.keys(sessions).length} sessions and ${Object.keys(wallets).length} wallets from DB.`);
+  } catch (err) {
+    console.error("CRITICAL: Failed to connect to DB", err);
   }
 }
 
-// Load initial data into memory when the bot starts
-Object.assign(sessions, loadDataFromFile(SESSIONS_FILE));
-const wallets = loadDataFromFile(WALLETS_FILE); // Private keys {publicKey: privateKey}
-
-console.log("Loaded sessions:", Object.keys(sessions).length);
-console.log("Loaded wallets:", Object.keys(wallets).length);
-
+// Fire-and-forget save functions optimized to prevent hitting Render network limits
+let saveTimeout = null;
 function saveSessions() {
-  saveDataToFile(SESSIONS_FILE, sessions);
+  if (!db) return;
+
+  // --- 🚀 MASSIVE RAM OPTIMIZATION SWEEP 🚀 ---
+  // Loops through all active sessions and hard-caps arrays before they bloat RAM
+  for (const id in sessions) {
+    const s = sessions[id];
+
+    // Cap transaction history to the last 150 events (plenty for the GUI)
+    if (s.history && s.history.length > 150) {
+      s.history = s.history.slice(-150);
+    }
+
+    // Cap the sparkline chart history to 60 points
+    if (s.fundsHistory && s.fundsHistory.length > 60) {
+      s.fundsHistory = s.fundsHistory.slice(-60);
+    }
+
+    // Cap Watchlist to 50 tokens
+    if (s.watchlist && s.watchlist.length > 50) {
+      s.watchlist = s.watchlist.slice(-50);
+    }
+  }
+  // -------------------------------------------
+
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    db.collection('storage').updateOne(
+      { _id: 'sessions' }, 
+      { $set: { data: sessions } }, 
+      { upsert: true }
+    ).catch(console.error);
+  }, 2000); 
 }
 
+let walletSaveTimeout = null;
 function saveWallets() {
-  saveDataToFile(WALLETS_FILE, wallets);
+  if (!db) return;
+  clearTimeout(walletSaveTimeout);
+  walletSaveTimeout = setTimeout(() => {
+    db.collection('storage').updateOne(
+      { _id: 'wallets' }, 
+      { $set: { data: wallets } }, 
+      { upsert: true }
+    ).catch(console.error);
+  }, 2000);
 }
 
+// Initialize immediately
+initDB();
+/* ---------- End Persistence ---------- */
 /* ---------- Utilities ---------- */
 // ADD THIS CODE to your Utilities section
 
