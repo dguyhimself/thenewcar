@@ -2447,7 +2447,7 @@ bot.on("text", async (ctx) => {
     return;
   }
 
-  if (s.awaitingBuyAmount) {
+if (s.awaitingBuyAmount) {
     s.awaitingBuyAmount = false;
     const amount = parseFloat(text.replace(/[^0-9.]/g, ""));
     const MINIMUM_BUY_AMOUNT = 10;
@@ -2456,7 +2456,7 @@ bot.on("text", async (ctx) => {
       await safeReply(
         ctx,
         "❌ Invalid amount. Setting was not changed.",
-        SNIPER_SETTINGS_KB(), // <-- CORRECTED
+        SNIPER_SETTINGS_KB(s) // <--- FIXED
       );
     } else if (amount < MINIMUM_BUY_AMOUNT) {
       await safeReply(
@@ -2464,7 +2464,7 @@ bot.on("text", async (ctx) => {
         `❌ Amount is too low. The minimum auto-snipe buy is ${formatUSD(
           MINIMUM_BUY_AMOUNT,
         )}.`,
-        SNIPER_SETTINGS_KB(), // <-- CORRECTED
+        SNIPER_SETTINGS_KB(s) // <--- FIXED
       );
     } else {
       s.settings.snipe.buyAmountUSD = amount;
@@ -2472,7 +2472,7 @@ bot.on("text", async (ctx) => {
       await safeReply(
         ctx,
         `✅ Auto-Snipe buy amount set to ${formatUSD(amount)}.`,
-        SNIPER_SETTINGS_KB(), // <-- CORRECTED
+        SNIPER_SETTINGS_KB(s) // <--- FIXED
       );
     }
     return;
@@ -2487,13 +2487,13 @@ bot.on("text", async (ctx) => {
       await safeReply(
         ctx,
         `✅ Slippage tolerance set to ${amount}%.`,
-        SNIPER_SETTINGS_KB(), // <-- CORRECTED
+        SNIPER_SETTINGS_KB(s) // <--- FIXED
       );
     } else {
       await safeReply(
         ctx,
         "❌ Invalid percentage. Please enter a number between 0 and 100.",
-        SNIPER_SETTINGS_KB(), // <-- CORRECTED
+        SNIPER_SETTINGS_KB(s) // <--- FIXED
       );
     }
     return;
