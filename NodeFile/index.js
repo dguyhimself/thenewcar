@@ -5427,6 +5427,12 @@ function cleanupAndExit() {
 process.once("SIGINT", cleanupAndExit);
 process.once("SIGTERM", cleanupAndExit);
 
+/* ---------- Global Error Catch ---------- */
+bot.catch((err, ctx) => {
+  console.error(`[Bot Error] for ${ctx.updateType}:`, err.message);
+  // Silently swallows the error so the polling engine never stops running.
+});
+
 /* Launch */
 async function startBot() {
   console.log("Initializing bot...");
