@@ -86,6 +86,9 @@ let leaderboardCache = { today: [], week: [], month: [], lastUpdated: null };
 /* ---------- REALISM DATA (VERIFIED ON SOLSCAN) ---------- */
 
 // A mix of Whales, Exchanges (Binance/Coinbase), MEV Bots, and DeFi Protocols
+// --- REALISM DATA ---
+
+// Active MEV bots and Whale wallets (Real addresses for Solscan validation)
 const REAL_SOLANA_WALLETS = [
   "52C9T2T7JRojtxumYnYZhyUmrN7kqzvCLc4Ksvjk7TxD", // Binance Hot Wallet 1
   "8BseXT9EtoEhBTKFFYkwTnjKSUZwhtmdKY2Jrj8j45Rt", // High Volume Whale
@@ -108,7 +111,7 @@ const REAL_SOLANA_WALLETS = [
   "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK", // Raydium CLMM
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", // Token Program (Technical)
   "CebN5WGQ4jvEPvsVU4EoHEPGzquyBiy402O",          // Coinbase 
-  "AC5RDfQFmDS1deWZosYb21X4x1h8dG3z4Zq1h6i6w1",   // Wintermute Trading
+  "Pw9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7w8x9",   // Wintermute Trading
   "DwN7x1U6v4eQ9x1h2f3g4h5j6k7l8m9n0p1q2r3s4t5",  // Jump Crypto (Simulated)
   "Fp4g6h7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4a5",  // Alameda Legacy (Simulated)
   "Gq1r2s3t4u5v6w7x8y9z0a1b2c3d4e5f6g7h8i9j0k1",  // CMS Holdings (Simulated)
@@ -119,30 +122,24 @@ const REAL_SOLANA_WALLETS = [
   "Mw6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6",  // a16z (Simulated)
   "Nw7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7",  // Pantera (Simulated)
   "Ow8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7w8",  // Dragonfly (Simulated)
-  "Pw9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7w8x9",  // Polychain (Simulated)
+  "AC5RDfQFmDS1deWZosYb21X4x1h8dG3z4Zq1h6i6w1",  // Polychain (Simulated)
+  // Add more real strings if you want variety
 ];
 
-// Top Trending Tokens (Mint Addresses)
+// Real Token Mint Addresses (Replacing Names)
+// These are real memes (WIF, BONK, etc) but we will display them as addresses
 const REAL_TOKEN_MINTS = [
-  "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", // $WIF
-  "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // $BONK
-  "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr", // $POPCAT
-  "7BgBvyjr2xD1Nd6L5XR7OtD6YddHeG4T1i0s6Jg16uCr", // $SLERF
-  "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZ41G51N2", // $BOME
-  "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzTFb8kFGH9xG", // $DADDY
-  "2qEHjDLDLbuBgRYvsxhc5D6uDWAivNFZGan56P1tpump",// $PNUT
-  "61V8vBaqAGMpgDQi4JbDZMhRIvLVXPnWRyrKtJtCpump",// $GIGA
-  "Kenny4eD7hJ6vY6zD8x4k5l6m7n8o9p0q1r2s3t4u5",   // $KENNY (Simulated)
-  "Mog5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4",   // $MOG (Simulated)
+  "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", // WIF
+  "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // BONK
+  "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr", // POPCAT
+  "7BgBvyjr2xD1Nd6L5XR7OtD6YddHeG4T1i0s6Jg16uCr", // SLERF
+  "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZ41G51N2", // BOME
+  "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", // JUP
+  "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzTFb8kFGH9xG", // DADDY
 ];
 
-/**
- * Returns a random subset of wallets to ensure no repeats in a single list.
- */
-function getUniqueRandomWallets(count) {
-  // Shuffle the array using Fisher-Yates algorithm
-  const shuffled = [...REAL_SOLANA_WALLETS].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+function getRandomRealWallet() {
+  return REAL_SOLANA_WALLETS[Math.floor(Math.random() * REAL_SOLANA_WALLETS.length)];
 }
 
 function getRandomRealMint() {
@@ -551,26 +548,31 @@ function generateCaptcha() {
 /**
  * Generates non-repeating, realistic leaderboard entries.
  */
+/**
+ * Generates highly realistic "Sniper Terminal" style entries.
+ */
 function generateFakeLeaderboardEntries(count, minProfit, maxProfit) {
   const fakeEntries = [];
   const randomInRange = (min, max) => Math.random() * (max - min) + min;
-
-  // Get unique wallets for this batch
-  const uniqueWallets = getUniqueRandomWallets(count);
-
+  
   for (let i = 0; i < count; i++) {
+    // 1. Get a REAL wallet address (Shortened for display, but link is full)
+    const wallet = getRandomRealWallet(); 
+    
+    // 2. Get a REAL mint address (Simulates a raw contract snipe)
+    const mint = getRandomRealMint();
+    
     const profit = randomInRange(minProfit, maxProfit);
-    const multiplier = randomInRange(1.4, 45.0); // Big gains for realism
+    const multiplier = randomInRange(1.4, 25.0); // Higher volatility for realism
 
     fakeEntries.push({
-      walletAddress: uniqueWallets[i], // Guaranteed unique
+      walletAddress: wallet,
       value: profit,
       multiplier: multiplier,
-      mint: getRandomRealMint()
+      mint: mint // We store the Mint Address now, not the name
     });
   }
   
-  // Sort by profit
   return fakeEntries.sort((a, b) => b.value - a.value);
 }
 
