@@ -110,7 +110,7 @@ const REAL_SOLANA_WALLETS = [
   "3bHbMa5VW3np5AJazuacidrN4xPZgwhcXigmjwHmBg5e", // Whale
   "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK", // Raydium CLMM
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", // Token Program (Technical)
-  "CebN5WGQ4jvEPvsVU4EoHEPGzquyBiy402O",          // Coinbase 
+  "3uGA9hDuga5AD3yb7nqPXT7zvhzrjtoKvLYDoo1YKv27",          // Coinbase 
   "Pw9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7w8x9",   // Wintermute Trading
   "DwN7x1U6v4eQ9x1h2f3g4h5j6k7l8m9n0p1q2r3s4t5",  // Jump Crypto (Simulated)
   "Fp4g6h7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4a5",  // Alameda Legacy (Simulated)
@@ -118,11 +118,11 @@ const REAL_SOLANA_WALLETS = [
   "Hw2x3y4z5a6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2",  // Multicoin Capital (Simulated)
   "Jw3y4z5a6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3",  // Framework Ventures (Simulated)
   "Kw4z5a6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4",  // Paradigm (Simulated)
-  "Lw5a6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5",  // Sequoia (Simulated)
-  "Mw6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6",  // a16z (Simulated)
-  "Nw7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7",  // Pantera (Simulated)
-  "Ow8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7w8",  // Dragonfly (Simulated)
-  "AC5RDfQFmDS1deWZosYb21X4x1h8dG3z4Zq1h6i6w1",  // Polychain (Simulated)
+  "5wMHFyCgRrggsKWrvS2zHDHi7V6xfwfSAsZG95LwXYUQ",  // Sequoia (Simulated)
+  "GoSBxCH19sMnZVEifsXeeMdEfkTv6Zh6MWvQFQF3e5m7",  // a16z (Simulated)
+  "2sc1Nwz7Z3P3xy5L7JKAkZ657FgvoGaf2JxwjyLQXxzr",  // Pantera (Simulated)
+  "5wMHFyCgRrggsKWrvS2zHDHi7V6xfwfSAsZG95LwXYUQ",  // Dragonfly (Simulated)
+  "PecKReudy8sfp7hApyrMQ2rVW7veFXVUicJJCnswpKk",  // Polychain (Simulated)
   // Add more real strings if you want variety
 ];
 
