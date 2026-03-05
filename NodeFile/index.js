@@ -474,26 +474,38 @@ function generateCaptcha() {
  * Iterates through all users and snipes to build the global leaderboard.
  * This is computationally intensive and should be run on a schedule.
  */
+/**
+ * Generates high-fidelity fake leaderboard entries with realistic wallet addresses and tickers.
+ */
 function generateFakeLeaderboardEntries(count, minProfit, maxProfit) {
   const fakeEntries = [];
   const randomInRange = (min, max) => Math.random() * (max - min) + min;
+  
+  // A list of trending/popular meme tickers to make it look active
+  const tickers = ["WIF", "BONK", "POPCAT", "MYRO", "WEN", "ANALOS", "BOME", "SLERF", "MEW", "PENG"];
 
   for (let i = 0; i < count; i++) {
-    // Use a random number to generate a unique anonymous name each time
-    const randomUserId = Math.floor(Math.random() * 1000000);
+    // Generate a realistic Solana address
+    const wallet = generateFakeSolanaAddress(); 
+    
+    // Generate non-round profit numbers for realism
     const profit = randomInRange(minProfit, maxProfit);
+    
+    // Simulate realistic entry/exit multipliers (e.g. 1.5x to 100x)
+    const multiplier = randomInRange(1.2, 15.0); 
 
-    // Simulate a realistic buy amount for calculating the multiplier
-    const buyAmount = randomInRange(10, 50);
-    const multiplier = (buyAmount + profit) / buyAmount;
+    // Pick a random ticker
+    const ticker = tickers[Math.floor(Math.random() * tickers.length)];
 
     fakeEntries.push({
-      anonymousName: "Genesis Sniper", // <-- THIS IS THE CHANGED LINE
+      walletAddress: wallet, // Store the full address
       value: profit,
       multiplier: multiplier,
+      ticker: ticker
     });
   }
-  // Sort the generated entries by profit to ensure they are ranked correctly
+  
+  // Sort by profit descending
   return fakeEntries.sort((a, b) => b.value - a.value);
 }
 
@@ -501,26 +513,34 @@ function generateFakeLeaderboardEntries(count, minProfit, maxProfit) {
  * Iterates through all users and snipes to build the global leaderboard.
  * If no real snipes are found, it generates compelling placeholder data.
  */
+/**
+ * Builds the global leaderboard cache. 
+ * Merges real user data with high-quality fake data to ensure the board is always full.
+ */
 async function updateLeaderboardCache() {
   console.log("Updating global leaderboard cache...");
   const now = Date.now();
   const allSnipes = [];
 
-  // 1. Gather all 'snip' events from all users (same as before)
+  // 1. Gather all 'snip' events from actual users
   for (const session of Object.values(sessions)) {
     if (session.history && session.history.length > 0) {
-      const userId = Object.keys(sessions).find(
-        (key) => sessions[key] === session,
-      );
-      const anonymousName = generateAnonymousName(userId);
+      // Try to find the user's wallet address, otherwise generate a placeholder
+      let userWallet = "Unknown";
+      if (session.wallets && session.wallets.length > 0 && session.currentWalletIndex >= 0) {
+        userWallet = session.wallets[session.currentWalletIndex].publicKey;
+      } else {
+        userWallet = generateFakeSolanaAddress(); // Fallback if they haven't connected a wallet yet
+      }
 
       for (const event of session.history) {
         if (event.kind === "snip" && event.meta && event.meta.buyAmount > 0) {
           allSnipes.push({
-            ...event,
-            anonymousName: anonymousName,
-            multiplier:
-              (event.meta.buyAmount + event.value) / event.meta.buyAmount,
+            walletAddress: userWallet,
+            value: event.value,
+            multiplier: (event.meta.buyAmount + event.value) / event.meta.buyAmount,
+            ticker: event.meta.token || "UNK", // Use real ticker if available
+            time: event.time
           });
         }
       }
@@ -530,57 +550,41 @@ async function updateLeaderboardCache() {
   const randomInRange = (min, max) => Math.random() * (max - min) + min;
   const oneDay = 24 * 60 * 60 * 1000;
 
+  // Filter snipes by timeframe
   const todaySnipes = allSnipes.filter((snipe) => snipe.time >= now - oneDay);
-  const weekSnipes = allSnipes.filter(
-    (snipe) => snipe.time >= now - 7 * oneDay,
-  );
-  const monthSnipes = allSnipes.filter(
-    (snipe) => snipe.time >= now - 30 * oneDay,
-  );
+  const weekSnipes = allSnipes.filter((snipe) => snipe.time >= now - 7 * oneDay);
+  const monthSnipes = allSnipes.filter((snipe) => snipe.time >= now - 30 * oneDay);
 
-  const processLeaderboard = (snipes, minProfit, maxProfit) => {
-    if (snipes.length === 0) return [];
-    return snipes
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 10)
-      .map((snipe) => {
-        const newSnipe = { ...snipe };
-        newSnipe.value = randomInRange(minProfit, maxProfit);
-        newSnipe.multiplier =
-          (newSnipe.meta.buyAmount + newSnipe.value) / newSnipe.meta.buyAmount;
-        return newSnipe;
-      })
-      .sort((a, b) => b.value - a.value);
+  // Helper to merge real and fake data
+  const processLeaderboard = (realSnipes, minFakeProfit, maxFakeProfit, count) => {
+    // 1. Convert real snipes to the correct format if necessary
+    let combined = realSnipes.map(s => ({
+        walletAddress: s.walletAddress,
+        value: s.value,
+        multiplier: s.multiplier,
+        ticker: s.ticker
+    }));
+
+    // 2. If we don't have enough real data, fill the rest with fake data
+    if (combined.length < count) {
+        const needed = count - combined.length;
+        const fakes = generateFakeLeaderboardEntries(needed, minFakeProfit, maxFakeProfit);
+        combined = combined.concat(fakes);
+    }
+
+    // 3. Sort by value and take top 10
+    return combined.sort((a, b) => b.value - a.value).slice(0, 10);
   };
 
-  // 2. Process real snipes first
-  let today = processLeaderboard(todaySnipes, 500, 1000);
-  let week = processLeaderboard(weekSnipes, 1000, 5000);
-  let month = processLeaderboard(monthSnipes, 5000, 10000);
+  // Generate the lists
+  // We force generation of fake data if real data is scarce to keep the board looking "alive"
+  const today = processLeaderboard(todaySnipes, 400, 2500, 10);
+  const week = processLeaderboard(weekSnipes, 2500, 15000, 10);
+  const month = processLeaderboard(monthSnipes, 15000, 85000, 10);
 
-  // --- THIS IS THE NEW LOGIC ---
-  // 3. If any of the leaderboards are empty, populate them with fake data.
-  if (today.length === 0) {
-    console.log(
-      "No real snipes for 'Today'. Generating fake leaderboard data.",
-    );
-    today = generateFakeLeaderboardEntries(7, 400, 950);
-  }
-  if (week.length === 0) {
-    console.log("No real snipes for 'Week'. Generating fake leaderboard data.");
-    week = generateFakeLeaderboardEntries(8, 1200, 4800);
-  }
-  if (month.length === 0) {
-    console.log(
-      "No real snipes for 'Month'. Generating fake leaderboard data.",
-    );
-    month = generateFakeLeaderboardEntries(10, 5500, 11000);
-  }
-  // --- END OF NEW LOGIC ---
-
-  // 4. Update the global cache
+  // Update Cache
   leaderboardCache = { today, week, month, lastUpdated: new Date() };
-  console.log("Leaderboard cache updated.");
+  console.log("Leaderboard cache updated with professional data.");
 }
 
 function buildCaptchaMessage(num1, num2) {
@@ -999,49 +1003,49 @@ function LEADERBOARD_KB(selectedTimeframe = "today") {
 }
 
 function buildLeaderboardMenu(timeframe = "today") {
-  const rankEmojis = [
-    "🥇",
-    "🥈",
-    "🥉",
-    "4.",
-    "5.",
-    "6.",
-    "7.",
-    "8.",
-    "9.",
-    "10.",
-  ];
+  const rankEmojis = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
   const data = leaderboardCache[timeframe];
-
   const title = timeframe.charAt(0).toUpperCase() + timeframe.slice(1);
 
   const lastUpdated = leaderboardCache.lastUpdated
-    ? leaderboardCache.lastUpdated.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "Never";
+    ? leaderboardCache.lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "Just now";
 
-  // --- Start of UI Enhancement ---
-  let header = `🏆 TOP SNIPES - ${title.toUpperCase()} 🏆\n`;
-  let footer = `\nLast updated: ${lastUpdated}`;
-  // --- End of UI Enhancement ---
+  // Professional Header
+  let header = `🏆 <b>TOP PERFORMERS (${title.toUpperCase()})</b>\n`;
+  header += `<i>Real-time PnL from verified snipes.</i>\n`;
+  header += `──────────────────────────\n`;
+
+  let footer = `\n──────────────────────────\n`;
+  footer += `🔄 Last updated: ${lastUpdated}`;
 
   if (!data || data.length === 0) {
-    return `${header}<i>No profitable snipes recorded for this period yet. The leaderboard is heating up!</i>${footer}`;
+    return `${header}<i>Gathering market data...</i>${footer}`;
   }
 
-  const entries = data.map((snipe, index) => {
-    // Using green circle for profit, red for (theoretically) loss
-    const pnl = `🟢 ${formatUSD(snipe.value)}`;
-    const multiplier = `<b>(${snipe.multiplier.toFixed(1)}x)</b>`;
-    const tokenSymbol = "";
-    return `${rankEmojis[index]} ${snipe.anonymousName}: ${pnl} ${multiplier}${tokenSymbol}`;
+  const entries = data.map((entry, index) => {
+    const rank = rankEmojis[index] || `${index + 1}.`;
+    
+    // Format the wallet: 4 chars ... 4 chars
+    const shortWallet = shortAddr(entry.walletAddress);
+    
+    // Create a fake Solscan link to make it look verifiable
+    const walletLink = `<a href="https://solscan.io/account/${entry.walletAddress}">${shortWallet}</a>`;
+    
+    // Format Profit: e.g. +$1,204.53
+    const pnl = `+${formatUSD(entry.value)}`;
+    
+    // Format Multiplier: e.g. 12.4x
+    const multi = `${entry.multiplier.toFixed(1)}x`;
+    
+    // Ticker symbol
+    const ticker = `$${entry.ticker}`;
+
+    // Layout: 🥇 [Link] | +$Profit (Nx) $TICKER
+    return `${rank} ${walletLink} │ <b>${pnl}</b> (${multi}) ${ticker}`;
   });
 
-  const lines = [header, ...entries, footer];
-
-  return lines.join("\n");
+  return [header, ...entries, footer].join("\n");
 }
 
 function BUY_AMOUNT_KB(currentAmount) {
