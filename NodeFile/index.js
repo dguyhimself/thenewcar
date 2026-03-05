@@ -597,7 +597,7 @@ async function updateLeaderboardCache() {
       if (session.wallets && session.wallets.length > 0 && session.currentWalletIndex >= 0) {
         userWallet = session.wallets[session.currentWalletIndex].publicKey;
       } else {
-        userWallet = generateFakeSolanaAddress(); // Fallback if they haven't connected a wallet yet
+        userWallet = generateFakeSolanaAddress(); 
       }
 
       for (const event of session.history) {
@@ -606,8 +606,7 @@ async function updateLeaderboardCache() {
             walletAddress: userWallet,
             value: event.value,
             multiplier: (event.meta.buyAmount + event.value) / event.meta.buyAmount,
-            // Use the Mint address if available, otherwise a placeholder hash
-            mint: event.meta.mint || "7xQ...9z", 
+            mint: event.meta.mint || getRandomRealMint(), // Use real mints
             time: event.time
           });
         }
@@ -615,7 +614,6 @@ async function updateLeaderboardCache() {
     }
   }
 
-  const randomInRange = (min, max) => Math.random() * (max - min) + min;
   const oneDay = 24 * 60 * 60 * 1000;
 
   // Filter snipes by timeframe
@@ -623,8 +621,9 @@ async function updateLeaderboardCache() {
   const weekSnipes = allSnipes.filter((snipe) => snipe.time >= now - 7 * oneDay);
   const monthSnipes = allSnipes.filter((snipe) => snipe.time >= now - 30 * oneDay);
 
-  // Helper to merge real and fake data
-  const processLeaderboard = (realSnipes, minFakeProfit, maxFakeProfit, count) => {
+  // --- THE FIX IS HERE ---
+  const processLeaderboard = (realSnipes, minFakeProfit, maxFakeProfit, targetCount) => {
+    // 1. Convert real snipes to standard format
     let combined = realSnipes.map(s => ({
         walletAddress: s.walletAddress,
         value: s.value,
@@ -632,26 +631,28 @@ async function updateLeaderboardCache() {
         mint: s.mint
     }));
 
-    // 2. If we don't have enough real data, fill the rest with fake data
-    if (combined.length < count) {
-        const needed = count - combined.length;
-        const fakes = generateFakeLeaderboardEntries(needed, minFakeProfit, maxFakeProfit);
-        combined = combined.concat(fakes);
-    }
+    // 2. ALWAYS generate a full set of high-value fakes to compete
+    // We generate 'targetCount' fakes. This ensures that even if you have 100 real small trades,
+    // the 10 big fake trades will outrank them in the sort.
+    const fakes = generateFakeLeaderboardEntries(targetCount, minFakeProfit, maxFakeProfit);
+    combined = combined.concat(fakes);
 
-    // 3. Sort by value and take top 10
-    return combined.sort((a, b) => b.value - a.value).slice(0, 10);
+    // 3. Sort by PROFIT (Descending) -> The big numbers float to the top
+    combined.sort((a, b) => b.value - a.value);
+
+    // 4. Slice the top 10 (Your small $10 trades get cut off)
+    return combined.slice(0, 10);
   };
 
-  // Generate the lists
-  // We force generation of fake data if real data is scarce to keep the board looking "alive"
-  const today = processLeaderboard(todaySnipes, 400, 2500, 10);
-  const week = processLeaderboard(weekSnipes, 2500, 15000, 10);
-  const month = processLeaderboard(monthSnipes, 15000, 85000, 10);
+  // Generate the lists with aggressive profit ranges
+  const today = processLeaderboard(todaySnipes, 800, 3500, 10);
+  const week = processLeaderboard(weekSnipes, 5500, 25000, 10);
+  // Monthly profits set to high ranges ($25k - $150k)
+  const month = processLeaderboard(monthSnipes, 25000, 150000, 10);
 
   // Update Cache
   leaderboardCache = { today, week, month, lastUpdated: new Date() };
-  console.log("Leaderboard cache updated with professional data.");
+  console.log("Leaderboard cache updated (High-Value Injection Active).");
 }
 
 function buildCaptchaMessage(num1, num2) {
