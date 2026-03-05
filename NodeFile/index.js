@@ -112,11 +112,11 @@ const REAL_SOLANA_WALLETS = [
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", // Token Program (Technical)
   "3uGA9hDuga5AD3yb7nqPXT7zvhzrjtoKvLYDoo1YKv27",          // Coinbase 
   "Pw9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4t5u6v7w8x9",   // Wintermute Trading
-  "DwN7x1U6v4eQ9x1h2f3g4h5j6k7l8m9n0p1q2r3s4t5",  // Jump Crypto (Simulated)
-  "Fp4g6h7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4a5",  // Alameda Legacy (Simulated)
-  "Gq1r2s3t4u5v6w7x8y9z0a1b2c3d4e5f6g7h8i9j0k1",  // CMS Holdings (Simulated)
-  "Hw2x3y4z5a6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2",  // Multicoin Capital (Simulated)
-  "Jw3y4z5a6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3",  // Framework Ventures (Simulated)
+  "G6Xds4GrATVFnomCoSMxGAXEZ9JVhBheTEfai8sADykQ",  // Jump Crypto (Simulated)
+  "6Vx957CDro7Ktjhy8dcVb6qdJkq5p5RVVwKehim1H2Pc",  // Alameda Legacy (Simulated)
+  "9uoeP5tFaxqL8MD3XeDFp67tRqPmoCRxkKXYcN4EH2Mb",  // CMS Holdings (Simulated)
+  "riDi6z4Lzch9FvcEzmkkx9gqCoPniMrTMFchbGaikGq",  // Multicoin Capital (Simulated)
+  "YubQzu18FDqJRyNfG8JqHmsdbxhnoQqcKUHBdUkN6tP",  // Framework Ventures (Simulated)
   "Kw4z5a6b7c8d9e0f1g2h3i4j5k6l7m8n9o0p1q2r3s4",  // Paradigm (Simulated)
   "5wMHFyCgRrggsKWrvS2zHDHi7V6xfwfSAsZG95LwXYUQ",  // Sequoia (Simulated)
   "GoSBxCH19sMnZVEifsXeeMdEfkTv6Zh6MWvQFQF3e5m7",  // a16z (Simulated)
