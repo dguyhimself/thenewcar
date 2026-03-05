@@ -91,18 +91,18 @@ let leaderboardCache = { today: [], week: [], month: [], lastUpdated: null };
 // Active MEV bots and Whale wallets (Real addresses for Solscan validation)
 const REAL_SOLANA_WALLETS = [
   "52C9T2T7JRojtxumYnYZhyUmrN7kqzvCLc4Ksvjk7TxD", // Binance Hot Wallet 1
-  "8BseXT9EtoEhBTKFFYkwTnjKSUZwhtmdKY2Jrj8j45Rt", // High Volume Whale
+  "4BGzqSKjJBt7HaF5tJCGDtejBfoTtxhkRc85DoEWF7eW", // High Volume Whale
   "GitYucwpNcg6Dx1Y15UQ9TQn8LZMX1uuqQNn8rXxEWNC", // Major Market Maker
   "9uRJ5aGgeu2i3J98hsC5FDxd2PmRjVy9fQwNAy7fzLG3", // Top Holder
   "39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg", // Pump.fun Migration Account
   "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8", // Raydium AMM Authority
   "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",  // Jupiter Aggregator
   "FVnv5qH7dsrBzEDwJ8dN2m9PFtKTBAQFtqWF3M9LpwMg",  // MEV Bot
-  "6DNxCNjsDDtPrun7g3C6C6T6q3x7B8x9u1b2n3m4k5j6", // Arbitrage Bot
+  "DwYJ3GtUGCz2qqBWQeZbD3UM3sEy4Y1fcKU61JV7WUFE", // Arbitrage Bot
   "MJKqp326RZCHnAAbew9MDdui3iCKWco7fsK9sVuZTX2", // Rank 1 SOL Holder
   "9QgXqrgdbVU8KcpfskqJpAXKzbaYQJecgMAruSWoXDkM", // Kraken Cold Storage
   "EJRJswH9LyjhAfBWwPBvat1LQtrJYK4sVUzsea889cQt", // Validator Staking
-  "53nHsQXkzZUp5MF1BK6Qoa48ud3aXfDFJBbe1oECPucC", // Institutional Custody
+  "F5F9VBhtkrf27gimspsyAcevqWnZwRCLWiPzJ851CQjn", // Institutional Custody
   "8PjJTv657aeN9p5R2WoM6pPSz385chvTTytUWaEjSjkq", // Whale
   "AHB94zKUASftTdqgdfiDSdnPJHkEFp7zX3yMrcSxABsv", // Whale
   "3D91zLQPRLamwJfGR5ZYMKQb4C18gsJNaSdmB6b2wLhw", // Whale
