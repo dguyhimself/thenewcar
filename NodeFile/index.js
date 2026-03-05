@@ -97,7 +97,7 @@ const REAL_SOLANA_WALLETS = [
   "39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg", // Pump.fun Migration Account
   "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8", // Raydium AMM Authority
   "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",  // Jupiter Aggregator
-  "HhJpBhRRn4g56VsyLuT8DL5sY2pHlfP6pb5f5e5w5t5",  // MEV Bot
+  "FVnv5qH7dsrBzEDwJ8dN2m9PFtKTBAQFtqWF3M9LpwMg",  // MEV Bot
   "6DNxCNjsDDtPrun7g3C6C6T6q3x7B8x9u1b2n3m4k5j6", // Arbitrage Bot
   "MJKqp326RZCHnAAbew9MDdui3iCKWco7fsK9sVuZTX2", // Rank 1 SOL Holder
   "9QgXqrgdbVU8KcpfskqJpAXKzbaYQJecgMAruSWoXDkM", // Kraken Cold Storage
@@ -129,13 +129,13 @@ const REAL_SOLANA_WALLETS = [
 // Real Token Mint Addresses (Replacing Names)
 // These are real memes (WIF, BONK, etc) but we will display them as addresses
 const REAL_TOKEN_MINTS = [
-  "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", // WIF
-  "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // BONK
-  "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr", // POPCAT
-  "7BgBvyjr2xD1Nd6L5XR7OtD6YddHeG4T1i0s6Jg16uCr", // SLERF
-  "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZ41G51N2", // BOME
-  "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", // JUP
-  "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzTFb8kFGH9xG", // DADDY
+  "GB8KtQfMChhYrCYtd5PoAB42kAdkHnuyAincSSmFpump", // WIF
+  "GMD16hpoKqfpXpPTWoymvzjddsruQsdqPu8T28ZKpump", // BONK
+  "6iA73gWCKkLWKbVr8rgibV57MMRxzsaqS9cWpgKBpump", // POPCAT
+  "5yC9BM8KUsJTPbWPLfA2N8qH1s9V8DQ3Vcw1G6Jdpump", // SLERF
+  "2RAZHF4tMUW7sa7F56Dc4xdTskZBswh7bAVXM4gapump", // BOME
+  "5BUp4qksXcwUaUhDr97z7uH36fDYezyBBPMXyANcpump", // JUP
+  "6VBfjADP5W9jBzbA63Yw45gjXHYndt6sRFAxiX7spump", // DADDY
 ];
 
 function getRandomRealWallet() {
