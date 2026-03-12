@@ -3243,6 +3243,104 @@ bot.action("menu_settings_sniper", async (ctx) => {
     await safeEditOrReply(ctx, text, SNIPER_SETTINGS_KB(s));
 });
 
+// --- HELPER FUNCTION TO RE-RENDER THE MENU ---
+async function renderPumpFilters(ctx, s) {
+  const text =[
+      "💊 <b>Pump.fun Launch Filters</b>",
+      "<i>Configure strict on-chain criteria for the auto-sniper engine. Tap buttons to cycle options.</i>",
+      "────────────────────────",
+      "• <b>Mcap Range:</b> Avoid dead coins or overpriced late entries.",
+      "• <b>Dev Max:</b> Protects against heavily bundled dev wallets.",
+      "• <b>Bonding Curve:</b> Max progression allowed for early entry.",
+      "• <b>Social Proof:</b> Demand linked Twitter/Telegram to filter low-effort rugs."
+  ].join("\n");
+  await safeEditOrReply(ctx, text, PUMP_FILTERS_KB(s));
+}
+
+// 1. Open the Menu
+bot.action("menu_pump_filters", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id] || defaultSession();
+
+  if (!s.settings.snipe.pumpFunFilters) {
+    s.settings.snipe.pumpFunFilters = { minMcap: 5, maxMcap: 65, maxDevHolding: 5, maxBondingCurve: 25, requireSocials: true };
+    saveSessions();
+  }
+  await renderPumpFilters(ctx, s);
+});
+
+// 2. Cycle Min Mcap
+bot.action("pf_min_mcap", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id];
+  const opts =[5, 10, 20, 30]; // Options in 'k'
+  const pf = s.settings.snipe.pumpFunFilters;
+
+  // Advance to next option or fallback to first
+  pf.minMcap = opts[(opts.indexOf(pf.minMcap) + 1) % opts.length] || opts[0];
+  if(pf.minMcap >= pf.maxMcap) pf.maxMcap = pf.minMcap + 20; // Safety check
+  saveSessions();
+
+  await ctx.answerCbQuery(); // Stops the button loading animation
+  await renderPumpFilters(ctx, s);
+});
+
+// 3. Cycle Max Mcap
+bot.action("pf_max_mcap", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id];
+  const opts =[50, 65, 80, 100, 250]; // Options in 'k'
+  const pf = s.settings.snipe.pumpFunFilters;
+
+  pf.maxMcap = opts[(opts.indexOf(pf.maxMcap) + 1) % opts.length] || opts[0];
+  if(pf.maxMcap <= pf.minMcap) pf.minMcap = pf.maxMcap - 20; // Safety check
+  saveSessions();
+
+  await ctx.answerCbQuery();
+  await renderPumpFilters(ctx, s);
+});
+
+// 4. Cycle Dev Holdings
+bot.action("pf_dev_hold", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id];
+  const opts =[5, 10, 15, 20]; // Percentages
+  const pf = s.settings.snipe.pumpFunFilters;
+
+  pf.maxDevHolding = opts[(opts.indexOf(pf.maxDevHolding) + 1) % opts.length] || opts[0];
+  saveSessions();
+
+  await ctx.answerCbQuery();
+  await renderPumpFilters(ctx, s);
+});
+
+// 5. Cycle Bonding Curve
+bot.action("pf_curve", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id];
+  const opts =[10, 25, 50, 80]; // Percentages
+  const pf = s.settings.snipe.pumpFunFilters;
+
+  pf.maxBondingCurve = opts[(opts.indexOf(pf.maxBondingCurve) + 1) % opts.length] || opts[0];
+  saveSessions();
+
+  await ctx.answerCbQuery();
+  await renderPumpFilters(ctx, s);
+});
+
+// 6. Toggle Socials
+bot.action("pf_socials", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id];
+  const pf = s.settings.snipe.pumpFunFilters;
+
+  pf.requireSocials = !pf.requireSocials;
+  saveSessions();
+
+  await ctx.answerCbQuery();
+  await renderPumpFilters(ctx, s);
+});
+
 // --- Market Manipulation Sub-Menu (NEW) ---
 // ADD the license check to this handler
 bot.action("menu_settings_market", async (ctx) => {
