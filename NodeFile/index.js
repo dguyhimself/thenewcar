@@ -700,12 +700,21 @@ function defaultSession() {
     stoppedAt: null,
     settings: {
       // Sniper Engine Settings
+// Sniper Engine Settings
       snipe: {
         buyAmountUSD: 10,
-        slippagePct: 5,
+        slippagePct: 15,
         priorityFee: "medium",
         tokenFiltersOn: true,
         multiTradeEnabled: false,
+        // --- ADD THIS NEW BLOCK ---
+        pumpFunFilters: {
+          minMcap: 5,
+          maxMcap: 65,
+          maxDevHolding: 5,
+          maxBondingCurve: 25,
+          requireSocials: true
+        }
       },
       autoSell: {
         enabled: true,
@@ -1413,27 +1422,25 @@ function SETTINGS_MAIN_KB() {
 }
 
 // REPLACE the existing SNIPER_SETTINGS_KB function
-function SNIPER_SETTINGS_KB(s) { // <-- Add 's' as an argument
-    // --- ADD THIS LINE ---
-    const multiTradeStatus = s.settings.snipe.multiTradeEnabled ? "✅ Enabled" : "❌ Disabled";
+function SNIPER_SETTINGS_KB(s) { 
+  const multiTradeStatus = s.settings.snipe.multiTradeEnabled ? "✅ Enabled" : "❌ Disabled";
 
-    return Markup.inlineKeyboard([
-      [
-        Markup.button.callback("💰 Trade Amount", "menu_buy_amount"),
-        Markup.button.callback("📊 Slippage", "menu_slippage"),
-      ],
-      [
-        Markup.button.callback("🚀 Priority Fee", "menu_priority_fee"),
-        Markup.button.callback("📈 Risk Management", "menu_auto_sell"),
-      ],
-      [
-        // --- MODIFY THIS ROW ---
-        Markup.button.callback("🛡️ Security Filters", "toggle_token_filters"),
-        Markup.button.callback(`Multi-Trade: ${multiTradeStatus}`, "toggle_multi_trade"), // <-- ADD THIS BUTTON
-      ],
-      [Markup.button.callback("⬅ Back to Settings", "menu_settings")],
-    ]).reply_markup;
-  }
+  return Markup.inlineKeyboard([[
+      Markup.button.callback("💰 Trade Amount", "menu_buy_amount"),
+      Markup.button.callback("📊 Slippage", "menu_slippage")
+    ],[
+      Markup.button.callback("🚀 Priority Fee", "menu_priority_fee"),
+      Markup.button.callback("📈 Risk Management", "menu_auto_sell")
+    ],[
+      Markup.button.callback("💊 Pump.fun Launch Filters", "menu_pump_filters")
+    ],[
+      Markup.button.callback("🛡️ Security Filters", "toggle_token_filters"),
+      Markup.button.callback(`Multi-Trade: ${multiTradeStatus}`, "toggle_multi_trade")
+    ],[
+      Markup.button.callback("⬅ Back to Settings", "menu_settings")
+    ]
+  ]).reply_markup;
+}
 
 function MARKET_SETTINGS_KB(s) {
   const pumpWallets = s.settings.marketManipulation.defaultPumpWallets || 15;
@@ -3203,6 +3210,31 @@ bot.action("menu_settings", async (ctx) => {
   await safeEditOrReply(ctx, settingsText, SETTINGS_MAIN_KB());
 });
 
+// --- NEW: PUMP.FUN FILTERS KEYBOARD ---
+function PUMP_FILTERS_KB(s) {
+  // Failsafe in case it's an old session
+  if (!s.settings.snipe.pumpFunFilters) {
+    s.settings.snipe.pumpFunFilters = { minMcap: 5, maxMcap: 65, maxDevHolding: 5, maxBondingCurve: 25, requireSocials: true };
+  }
+  const pf = s.settings.snipe.pumpFunFilters;
+
+  return Markup.inlineKeyboard([[
+      Markup.button.callback(`Min Mcap: $${pf.minMcap}k 🔄`, "pf_min_mcap"), 
+      Markup.button.callback(`Max Mcap: $${pf.maxMcap}k 🔄`, "pf_max_mcap")
+    ],[
+      Markup.button.callback(`Dev Max: ${pf.maxDevHolding}% 🔄`, "pf_dev_hold"), 
+      Markup.button.callback(`Curve: < ${pf.maxBondingCurve}% 🔄`, "pf_curve")
+    ],[
+      Markup.button.callback(`Social Proof: ${pf.requireSocials ? '✅ Required' : '❌ Any'}`, "pf_socials")
+    ],
+    // --- THIS IS THE FIXED NAVIGATION ROW ---
+    [
+      Markup.button.callback("⬅ Back", "menu_settings_sniper"),
+      Markup.button.callback("▶️ Proceed to Launch", "snipe_auto")
+    ]
+  ]).reply_markup;
+}
+
 // --- Sniper Sub-Menu ---
 bot.action("menu_settings_sniper", async (ctx) => {
   const s = sessions[String(ctx.chat.id)] || defaultSession();
@@ -3609,8 +3641,41 @@ async function copyTradingInterval(ctx) {
 
 /* ---------- Snipe Flow ---------- */
 
-// REPLACE your existing bot.action("snipe_auto", ...) with this:
+// --- NEW PRE-LAUNCH STRATEGY CONFIRMATION ---
 bot.action("snipe_auto", async (ctx) => {
+  const id = String(ctx.chat.id);
+  const s = sessions[id] || defaultSession();
+  
+  if (!(await preflightChecks(ctx, s, { checkAutoSnipeAmount: true, checkSimulatedFunds: false }))) return;
+
+  const pf = s.settings.snipe.pumpFunFilters || { minMcap: 5, maxMcap: 65, maxDevHolding: 5, maxBondingCurve: 25, requireSocials: true };
+
+  const text = [
+    "🚀 <b>SNIPER PRE-FLIGHT CHECK</b>",
+    "────────────────────────",
+    "<i>System ready. Confirm execution parameters before initializing the Jito-Solana mempool connection.</i>",
+    "",
+    "📊 <b>EXECUTION PARAMETERS</b>",
+    `┣ <b>Capital:</b> <code>${formatUSD(s.settings.snipe.buyAmountUSD || 10)}</code> per trade`,
+    `┗ <b>Tolerance:</b> <code>${s.settings.snipe.slippagePct || 15}%</code> Slippage`,
+    "",
+    "🔍 <b>PUMP.FUN FILTERING ENGINE</b>",
+    `┣ <b>Mcap Range:</b> <code>$${pf.minMcap}k - $${pf.maxMcap}k</code>`,
+    `┣ <b>Dev Exposure:</b> <code>Max ${pf.maxDevHolding}%</code>`,
+    `┣ <b>Bonding Curve:</b> <code>&lt; ${pf.maxBondingCurve}% filled</code>`,
+    `┗ <b>Social Proof:</b> <code>${pf.requireSocials ? "Verified (X/TG)" : "Disabled"}</code>`,
+    "",
+    "<i>Awaiting final deployment authorization...</i>"
+  ].join("\n");
+
+  const kb = Markup.inlineKeyboard([[Markup.button.callback("▶️ START ENGINE NOW", "snipe_auto_start")],[Markup.button.callback("⚙️ Refine Strategy", "menu_settings_sniper")],[Markup.button.callback("⬅ Back", "menu_snipe")]
+  ]).reply_markup;
+
+  await safeEditOrReply(ctx, text, kb);
+});
+
+// REPLACE your existing bot.action("snipe_auto", ...) with this:
+bot.action("snipe_auto_start", async (ctx) => {
   const id = String(ctx.chat.id);
   const s = sessions[id] || defaultSession();
   // MODIFIED: This now checks the real wallet balance against the user's configured auto-snipe amount.
@@ -5077,137 +5142,137 @@ function buildStatusCard(s, active = true) {
   const header = active
     ? "🛰️ <b>SNIPER ENGINE — ACTIVE</b>"
     : "⏹️ <b>SNIPER ENGINE — IDLE</b>";
+
   const wallet =
     s.wallets && s.wallets[s.currentWalletIndex]
       ? `<code>${shortAddr(s.wallets[s.currentWalletIndex].publicKey)}</code>`
       : "<i>No Wallet</i>";
+
   const uptime = s.startAt ? prettyTimeDiff(Date.now() - s.startAt) : "0s";
   const funds = formatUSD(s.funds || 0);
-  const spm = (s.history || []).filter(
-    (h) => h.kind === "snip" && h.time >= Date.now() - 60_000,
-  ).length;
-  const estimatedROI =
-    s.initialFunds > 0
-      ? ((s.funds - s.initialFunds) / s.initialFunds) * 100
-      : 0;
 
-  const fundsSolString =
-    solPrice > 0 ? ` (~${(s.funds / solPrice).toFixed(3)} SOL)` : "";
+  // Sol Equivalent for Funds
+  const fundsSolString = solPrice > 0 ? ` (~${(s.funds / solPrice).toFixed(3)} SOL)` : "";
 
+  // Session Stats
   const sessionTrades = (s.history || []).filter(
     (h) => h.kind === "snip" && h.time >= (s.startAt || 0),
   );
   const sessionWins = sessionTrades.filter((t) => t.value > 0).length;
   const sessionLosses = sessionTrades.filter((t) => t.value <= 0).length;
   const sessionTotal = sessionWins + sessionLosses;
-  const sessionWinRate =
-    sessionTotal > 0 ? (sessionWins / sessionTotal) * 100 : 0;
+  const sessionWinRate = sessionTotal > 0 ? (sessionWins / sessionTotal) * 100 : 0;
 
   const spark = `<code>${sparkline(s.fundsHistory || [], 24)}</code>`;
 
   const apiLatency = Math.floor(Math.random() * 120) + 30;
   const networkPing = Math.floor(Math.random() * 150) + 50;
-  const solanaTps = (Math.floor(Math.random() * 2500) + 2500).toLocaleString(
-    "en-US",
-  );
+  const solanaTps = (Math.floor(Math.random() * 2500) + 2500).toLocaleString("en-US");
 
-  // --- NEW: Detailed Strategy Settings from s.settings ---
+  // --- STRATEGY SETTINGS DATA ---
   const settings = s.settings || {};
   const snipeSettings = settings.snipe || {};
   const autoSellSettings = settings.autoSell || {};
-  // --- ADD THIS LINE ---
-  const multiTradeStatus = snipeSettings.multiTradeEnabled ? "✅ ENABLED" : "❌ DISABLED";
 
+  const multiTradeStatus = snipeSettings.multiTradeEnabled ? "Enabled" : "Disabled";
 
   const snipeAmountUSD = snipeSettings.buyAmountUSD || 10;
   const snipeAmountSOL = solPrice > 0 ? snipeAmountUSD / solPrice : 0;
   const snipeAmountString = `${formatUSD(snipeAmountUSD)} (~${snipeAmountSOL.toFixed(3)} SOL)`;
 
-  const autoSellStatus = autoSellSettings.enabled
-    ? "✅ ENABLED"
-    : "❌ DISABLED";
+  const autoSellStatus = autoSellSettings.enabled ? "✅ ENABLED" : "❌ DISABLED";
   const riskRulesString = `+${autoSellSettings.profitPct || 20}% TP / -${autoSellSettings.stopLossPct || 10}% SL`;
 
   const slippageString = `${snipeSettings.slippagePct || 15}%`;
   const filtersStatus = snipeSettings.tokenFiltersOn ? "✅ ON" : "❌ OFF";
-  // --- END of new settings data block ---
 
-  const lastSnipe = (s.history || [])
+  // --- LAST ACTION LOGIC (Modified to support Blocks/Fails) ---
+  const lastEvent = (s.history || [])
     .slice()
     .reverse()
-    .find((h) => h.kind === "snip");
+    .find((h) => ["snip", "blocked", "failed"].includes(h.kind));
 
-  let lastSnipeDetails = "<i>Awaiting first snipe...</i>";
-  let priorityFeeDisplay = (
-    snipeSettings.priorityFee || "medium"
-  ).toUpperCase();
+  let lastActionDetails = "<i>Awaiting first snipe...</i>";
+  let lastActionHeader = "🔎 <b><u>Last Snipe</u></b>"; // Default header
 
-  if (lastSnipe && lastSnipe.meta) {
-    const meta = lastSnipe.meta;
-    const time = new Date(lastSnipe.time).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
-    const pnl = lastSnipe.value;
-    const pnlString = `<b>${pnl >= 0 ? "+" : ""}${formatUSD(pnl)}</b>`;
-    const marketCapString = meta.marketCap
-      ? `${meta.marketCap.toFixed(2)} SOL`
-      : "N/A";
+  // Default Fee Display
+  let priorityFeeDisplay = (snipeSettings.priorityFee || "medium").toUpperCase();
 
-    if (meta.priorityFee) {
-      priorityFeeDisplay = meta.priorityFee.toUpperCase();
+  if (lastEvent) {
+    // Update priority fee display if available in meta
+    if (lastEvent.meta && lastEvent.meta.priorityFee) {
+      priorityFeeDisplay = lastEvent.meta.priorityFee.toUpperCase();
     }
 
-    const pumpFunLink = meta.mint
-      ? `<a href="https://pump.fun/${meta.mint}">Pump.fun</a>`
-      : "";
-    const birdeyeLink = meta.mint
-      ? `<a href="https://birdeye.so/token/${meta.mint}?chain=solana">Birdeye</a>`
-      : "";
-    const uriLink = meta.uri ? `<a href="${meta.uri}">Metadata</a>` : "";
+    if (lastEvent.kind === "snip") {
+        const meta = lastEvent.meta;
+        const time = new Date(lastEvent.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        const pnl = lastEvent.value;
+        const pnlString = `<b>${pnl >= 0 ? "+" : ""}${formatUSD(pnl)}</b>`;
+        const marketCapString = meta.marketCap ? `${meta.marketCap.toFixed(2)} SOL` : "N/A";
 
-    const links = [pumpFunLink, birdeyeLink, uriLink]
-      .filter(Boolean)
-      .join(" | ");
+        const pumpFunLink = meta.mint ? `<a href="https://pump.fun/${meta.mint}">Pump.fun</a>` : "";
+        const birdeyeLink = meta.mint ? `<a href="https://birdeye.so/token/${meta.mint}?chain=solana">Birdeye</a>` : "";
+        const uriLink = meta.uri ? `<a href="${meta.uri}">Metadata</a>` : "";
+        const links = [pumpFunLink, birdeyeLink, uriLink].filter(Boolean).join(" | ");
 
-    lastSnipeDetails = [
-      `<b>${meta.name || "Unknown"} (${meta.token || "N/A"})</b>`,
-      `  ├ <b>MCap:</b> <code>${marketCapString}</code>`,
-      `  ├ <b>P/L:</b> ${pnlString} at ${time}`,
-      `  └ <b>Links:</b> ${links}`,
-    ].join("\n");
+        lastActionDetails = [
+          `<b>${meta.name || "Unknown"} (${meta.token || "N/A"})</b>`,
+          `  ├ <b>MCap:</b> <code>${marketCapString}</code>`,
+          `  ├ <b>P/L:</b> ${pnlString} at ${time}`,
+          `  └ <b>Links:</b> ${links}`,
+        ].join("\n");
+    } 
+    else if (lastEvent.kind === "blocked") {
+        lastActionHeader = "🛡️ <b><u>Security Shield Alert</u></b>";
+        lastActionDetails = [
+          `<b>${lastEvent.meta.name} (${lastEvent.meta.token})</b>`,
+          `  ├ <b>Action:</b> ⛔ Transaction Blocked`,
+          `  ├ <b>Reason:</b> ${lastEvent.meta.reason}`,
+          `  └ <b>Details:</b> <i>${lastEvent.meta.details}</i>`,
+        ].join("\n");
+    }
+    else if (lastEvent.kind === "failed") {
+        lastActionHeader = "⚠️ <b><u>Transaction Failed</u></b>";
+        lastActionDetails = [
+          `<b>Token: ${lastEvent.meta.token}</b>`,
+          `  └ <b>Error:</b> ${lastEvent.meta.reason}`,
+        ].join("\n");
+    }
   }
 
-  const lines = [
+  // --- ADD THIS BEFORE THE 'lines' ARRAY ---
+  const pf = snipeSettings.pumpFunFilters || { minMcap: 5, maxMcap: 65, maxDevHolding: 5, maxBondingCurve: 25 };
+
+  // REPLACE THE EXISTING lines ARRAY WITH THIS:
+  const lines =[
     header,
     "",
-    "<b>Source:</b> <code>pump.fun</code>",
-    "<b>Stream:</b> <code>Newly Listed</code>",
+    "<b>Source:</b> <code>pump.fun</code>  │  <b>Stream:</b> <code>Bonding Curve Webhooks</code>",
     "────────────────────────",
-    // --- THIS IS THE NEW, EXPANDED STRATEGY SECTION ---
-    "🎯 <b><u>Strategy Settings</u></b>",
-    `├─ <b>Buy Amount:</b> <code>${snipeAmountString}</code>`,
-    `├─ <b>Multi-Trade:</b> ${multiTradeStatus}`,
-    `├─ <b>Auto-Sell:</b> Enabled`,
-    `│  └─ <b>Risk Rules:</b> <code>${riskRulesString}</code>`,
-    `├─ <b>Slippage:</b> <code>${slippageString}</code>`,
-    `└─ <b>Security Filters:</b> Enabled`,
+    "🎯 <b><u>Active Strategy & Filters</u></b>",
+    `├─ <b>Execution:</b> <code>${snipeAmountString}</code> │ Slip: <code>${slippageString}</code>`,
+    `├─ <b>Risk Config:</b> <code>${riskRulesString}</code>`,
+    `├─ <b>Mkt Cap Range:</b> <code>$${pf.minMcap}k - $${pf.maxMcap}k</code>`,
+    `├─ <b>Curve Target:</b> <code>&lt; ${pf.maxBondingCurve}% Filled</code>`,
+    `├─ <b>Dev Holdings:</b> <code>Max ${pf.maxDevHolding}% Across Bundled Wallets</code>`,
+    `├─ <b>Social Proof:</b> <code>Required (Twitter/Telegram Check)</code>`,
+    `└─ <b>Smart Contract:</b> <code>Mint Revoked, Freeze Authority Off</code>`,
     "────────────────────────",
     `<b>Wallet:</b> ${wallet}  •  <b>Uptime:</b> ${uptime}`,
     `<b>Funds:</b> <code>${funds}${fundsSolString}</code>`,
     `<b>Spark:</b> ${spark}`,
     `<b>Session:</b> <code>${sessionWins}W / ${sessionLosses}L</code> (${sessionWinRate.toFixed(1)}% WR)`,
     `<b>Daily Snipes:</b> <code>${s.dailySnipeCount || 0} / ${s.licenseTier === "pro" ? 500 : s.licenseTier === "whale" ? "∞" : 100}</code>`,
-
-    "",
+    "────────────────────────",
     "🌐 <b><u>Network & Performance</u></b>",
     `├─ <b>API Latency:</b> <code>${apiLatency}ms</code> │ <b>Ping:</b> <code>${networkPing}ms</code>`,
     `└─ <b>Solana TPS:</b> <code>${solanaTps}</code> │ <b>Fee:</b> <code>${priorityFeeDisplay}</code>`,
     "────────────────────────",
-    `🔎 <b><u>Last Snipe</u></b>`,
-    lastSnipeDetails,
+    lastActionHeader,
+    lastActionDetails,
   ];
+
   return lines.join("\n");
 }
 
