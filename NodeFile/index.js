@@ -3432,40 +3432,35 @@ bot.action("back_to_settings_sniper", async (ctx) => {
 });
 
 bot.action("menu_help", async (ctx) => {
-  const helpText = `
-  <b>❓ SnipeX Help & Support Center</b>
+  const helpText =[
+    "📚 <b>SNIPEX DOCUMENTATION & SUPPORT</b>",
+    "────────────────────────",
+    "<i>SnipeX is an institutional-grade CLI terminal for Solana automated execution. Below is the technical breakdown of core modules.</i>",
+    "",
+    "🏦 <b>1. Capital Architecture (Wallets)</b>",
+    "┣ <b>Deployment:</b> Create or import a private key via Wallet Manager.",
+    "┗ <b>Routing:</b> The bot uses proprietary RPC routing for ultra-low latency.",
+    "",
+    "⚡ <b>2. Execution Engine (Sniper)</b>",
+    "┣ <b>Auto-Snipe:</b> Subscribes to Pump.fun WebSocket events to hit Block 0.",
+    "┗ <b>Semi-Auto:</b> Manual contract input for targeted execution.",
+    "",
+    "🛡️ <b>3. Risk & Filtering (Pump.fun)</b>",
+    "┣ <b>Mcap Range:</b> Ignores dead launches and over-valued entries.",
+    "┣ <b>Dev Exposure:</b> Blocks tokens where bundled Dev wallets hold > X%.",
+    "┣ <b>Bonding Curve:</b> Executes only if the curve is below your threshold.",
+    "┗ <b>Auto-Sell:</b> Trailing TP/SL triggers based on tick-by-tick data.",
+    "",
+    "🐋 <b>4. Advanced Modules (Licensed)</b>",
+    "┣ <b>Copy Trading:</b> Algorithmic mirroring of target wallet signatures.",
+    "┗ <b>Market Maker:</b> Volume spoofing and multi-wallet liquidity bundling.",
+    "",
+    "💬 <b>5. Support & Licensing</b>",
+    "┣ <b>Assistance:</b> Contact @dguyhimself for troubleshooting.",
+    "┗ <b>Upgrades:</b> Use the 'Upgrade Plan' menu for Pro/Whale tiers.",
+    "────────────────────────"
+  ].join("\n");
 
-  This guide provides an overview of the key features of the SnipeX platform, designed to help you trade with precision and confidence.
-
-  <b>1. Wallet Management</b>
-  The foundation of your trading activity. Use the <i>💳 Wallet Manager</i> menu to:
-  • <b>Create a New Wallet:</b> Generate a secure, new Solana wallet managed by the bot.
-  • <b>Import a Wallet:</b> Securely import an existing wallet using its private key.
-  • <b>Switch & Manage:</b> A wallet must be active before you can use any trading features.
-
-  <b>2. Core Trading Features</b>
-  • <b>🎯 Snipe → Auto Sniper:</b> This is the primary engine. It continuously scans the network for newly launched tokens and executes trades based on your configured settings.
-  • <b>🎯 Snipe → Semi-Auto:</b> Allows you to target a specific token by pasting its mint address for a direct, manual purchase.
-  • <b>🐋 Copy Trading (Licensed):</b> An advanced feature that allows you to automatically mirror the trades of a designated whale wallet based on your custom rules.
-
-  <b>3. Monitoring Your Performance</b>
-  • <b>📊 Performance:</b> Access a comprehensive dashboard displaying your key metrics, including Total Profit/Loss (P/L), Return on Investment (ROI), and Win Rate.
-  • <b>📝 History:</b> View a detailed, real-time log of all bot activities, including snipes, manual trades, withdrawals, and system notifications.
-
-  <b>4. Bot Configuration</b>
-  Navigate to <i>⚙ Settings</i> to fine-tune the bot's behavior:
-  • <b>Auto-Snipe Buy:</b> Set the default USD amount for each trade.
-  • <b>Slippage:</b> Configure your tolerance for price changes during a swap.
-  • <b>Priority Fee:</b> Increase your transaction speed for a competitive edge.
-  • <b>Auto-Sell Rules:</b> Define automatic take-profit and stop-loss targets.
-
-  <b>5. Need Assistance?</b>
-  If you have any questions, encounter technical issues, or require assistance with your license, please contact our dedicated support team.
-
-  <b>Support Contact:</b> @dguyhimself
-
-  Use the buttons below to navigate back to the main menu.
-    `;
   await safeEditOrReply(ctx, helpText, MAIN_KB());
 });
 
@@ -5012,91 +5007,98 @@ async function safeEditOrReply(ctx, text, replyMarkup = null) {
 // REPLACE your existing buildAdvancedSettingsDashboard function with this one
 
 function buildAdvancedSettingsDashboard(s) {
-    const settings = s.settings;
+  const settings = s.settings;
 
-    // --- Status Indicators (remains the same) ---
-    const status_on = "🟢";
-    const status_off = "🔴";
-    const status_med = "🟡";
+  // --- Status Indicators ---
+  const status_on = "🟢";
+  const status_off = "🔴";
+  const status_med = "🟡";
 
-    // --- Sniper Engine Data ---
-    const snipeAmount = formatUSD(settings.snipe.buyAmountUSD || 10);
-    const slippage = `${settings.snipe.slippagePct || 15}%`;
-    const priorityFee = (settings.snipe.priorityFee || "medium").toUpperCase();
-    const riskStatus = {
-      status: settings.autoSell.enabled ?
-        `${status_on} ACTIVE` :
-        `${status_off} INACTIVE`,
-      rules: `+${settings.autoSell.profitPct}% / -${settings.autoSell.stopLossPct}%`,
-    };
-    // --- THIS IS THE NEW LINE ---
-    const multiTradeStatus = settings.snipe.multiTradeEnabled ? `${status_on} ENABLED` : `${status_off} DISABLED`;
+  // --- Sniper Engine Data ---
+  const snipeAmount = formatUSD(settings.snipe.buyAmountUSD || 10);
+  const slippage = `${settings.snipe.slippagePct || 15}%`;
+  const priorityFee = (settings.snipe.priorityFee || "medium").toUpperCase();
+  const riskStatus = {
+    status: settings.autoSell.enabled
+      ? `${status_on} ACTIVE`
+      : `${status_off} INACTIVE`,
+    rules: `+${settings.autoSell.profitPct}% / -${settings.autoSell.stopLossPct}%`,
+  };
+  const multiTradeStatus = settings.snipe.multiTradeEnabled
+    ? `${status_on} ENABLED`
+    : `${status_off} DISABLED`;
 
+  // --- Pump.fun Filter Data ---
+  const pf = settings.snipe.pumpFunFilters || { minMcap: 5, maxMcap: 65, maxDevHolding: 5, maxBondingCurve: 25, requireSocials: true };
 
-    // --- Copy Trading Data (remains the same) ---
-    const copyStatus = s.copyTrading.enabled ?
-      `${status_on} ACTIVE` :
-      `${status_off} INACTIVE`;
-    const whaleAddress = shortAddr(s.copyTrading.whaleAddress) || "NOT SET";
+  // --- Copy Trading Data ---
+  const copyStatus = s.copyTrading.enabled
+    ? `${status_on} ACTIVE`
+    : `${status_off} INACTIVE`;
+  const whaleAddress = shortAddr(s.copyTrading.whaleAddress) || "NOT SET";
 
-    // --- Market Manipulation Data (remains the same) ---
-    const pumpWallets = settings.marketManipulation.defaultPumpWallets || 15;
-    const washIntensity = (
-      settings.marketManipulation.washTradeIntensity || "medium"
-    ).toUpperCase();
+  // --- Market Manipulation Data ---
+  const pumpWallets = settings.marketManipulation.defaultPumpWallets || 15;
+  const washIntensity = (
+    settings.marketManipulation.washTradeIntensity || "medium"
+  ).toUpperCase();
 
-    // --- History & Logging Data (remains the same) ---
-    const logLevel = (settings.history.logLevel || "normal").toUpperCase();
-    const retention = `${settings.history.retentionDays || 30} Days`;
+  // --- History & Logging Data ---
+  const logLevel = (settings.history.logLevel || "normal").toUpperCase();
+  const retention = `${settings.history.retentionDays || 30} Days`;
 
-    // --- General Data (remains the same) ---
-    let notificationIcon;
-    switch (settings.notificationVolume) {
-      case "low":
-        notificationIcon = status_med;
-        break;
-      case "mute":
-        notificationIcon = status_off;
-        break;
-      default:
-        notificationIcon = status_on;
-    }
-    const notifications = `${notificationIcon} ${(
-      settings.notificationVolume || "normal"
-    ).toUpperCase()}`;
-    const confirmations = settings.requireConfirmation ?
-      `${status_on} ENABLED` :
-      `${status_off} DISABLED`;
-
-    // --- Construct the new, sophisticated dashboard ---
-    const dashboard = [
-      "╔═══════════ <b>SYSTEM CONFIGURATION</b> ═══════════╗",
-      `║ <b>Status:</b> ${status_on} OPERATIONAL`,
-      "╠═══════════════ 🎯 <b>Sniper Engine</b> ═══════════════╣",
-      `║ • Trade Amount ........ <code>${snipeAmount}</code>`,
-      `║ • Slippage Tolerance .. <code>${slippage}</code>`,
-      `║ • Priority Fee ........ <code>${priorityFee}</code>`,
-      // --- THIS IS THE ADDED LINE, PERFECTLY ALIGNED ---
-      `║ • Multi-Trade ......... ${multiTradeStatus}`,
-      `║ • Risk Management ..... ${riskStatus.status}`,
-      `║   ↳ Rules ............. <code>${riskStatus.rules}</code>`,
-      "╠══════════════ 🐋 <b>Copy Trading</b> ═══════════════╣",
-      `║ • Module Status ....... ${copyStatus}`,
-      `║ • Target Wallet ....... <code>${whaleAddress}</code>`,
-      "╠═══════════ 🧪 <b>Market Manipulation</b> ═══════════╣",
-      `║ • Pump Wallets ........ <code>${pumpWallets} wallets</code>`,
-      `║ • Wash Intensity ...... <code>${washIntensity}</code>`,
-      "╠═════════════ 📝 <b>History & Logging</b> ═════════════╣",
-      `║ • Log Verbosity ....... <code>${logLevel}</code>`,
-      `║ • Data Retention ...... <code>${retention}</code>`,
-      "╠═══════════════════ ⚙️ <b>General</b> ═══════════════════╣",
-      `║ • Notifications ....... ${notifications}`,
-      `║ • Confirmations ....... ${confirmations}`,
-      "╚════════════ Bot v1.8.0 ════════════╝",
-    ];
-
-    return dashboard.join("\n");
+  // --- General Data ---
+  let notificationIcon;
+  switch (settings.notificationVolume) {
+    case "low":
+      notificationIcon = status_med;
+      break;
+    case "mute":
+      notificationIcon = status_off;
+      break;
+    default:
+      notificationIcon = status_on;
   }
+  const notifications = `${notificationIcon} ${(
+    settings.notificationVolume || "normal"
+  ).toUpperCase()}`;
+  const confirmations = settings.requireConfirmation
+    ? `${status_on} ENABLED`
+    : `${status_off} DISABLED`;
+
+  // --- Construct the Dashboard ---
+  const dashboard =[
+    "╔═══════════ <b>SYSTEM CONFIGURATION</b> ═══════════╗",
+    `║ <b>Status:</b> ${status_on} OPERATIONAL`,
+    "╠═══════════════ 🎯 <b>Sniper Engine</b> ═══════════════╣",
+    `║ • Trade Amount ........ <code>${snipeAmount}</code>`,
+    `║ • Slippage Tolerance .. <code>${slippage}</code>`,
+    `║ • Priority Fee ........ <code>${priorityFee}</code>`,
+    `║ • Multi-Trade ......... ${multiTradeStatus}`,
+    `║ • Risk Management ..... ${riskStatus.status}`,
+    `║   ↳ Rules ............. <code>${riskStatus.rules}</code>`,
+    "╠════════════ 💊 <b>Pump.fun Filters</b> ═════════════╣",
+    `║ • Target Mcap ......... <code>$${pf.minMcap}k - $${pf.maxMcap}k</code>`,
+    `║ • Dev Holding Max ..... <code>${pf.maxDevHolding}%</code>`,
+    `║ • Bonding Curve ....... <code>&lt; ${pf.maxBondingCurve}%</code>`,
+    `║ • Social Proof ........ <code>${pf.requireSocials ? "Required" : "Disabled"}</code>`,
+    "╠══════════════ 🐋 <b>Copy Trading</b> ═══════════════╣",
+    `║ • Module Status ....... ${copyStatus}`,
+    `║ • Target Wallet ....... <code>${whaleAddress}</code>`,
+    "╠═══════════ 🧪 <b>Market Manipulation</b> ═══════════╣",
+    `║ • Pump Wallets ........ <code>${pumpWallets} wallets</code>`,
+    `║ • Wash Intensity ...... <code>${washIntensity}</code>`,
+    "╠═════════════ 📝 <b>History & Logging</b> ═════════════╣",
+    `║ • Log Verbosity ....... <code>${logLevel}</code>`,
+    `║ • Data Retention ...... <code>${retention}</code>`,
+    "╠═══════════════════ ⚙️ <b>General</b> ═══════════════════╣",
+    `║ • Notifications ....... ${notifications}`,
+    `║ • Confirmations ....... ${confirmations}`,
+    "╚════════════ Bot v1.8.0 ════════════╝",
+  ];
+
+  return dashboard.join("\n");
+}
 function buildFooter() {
   const supportUser = "dguyhimself"; // Your support username
   const websiteUrl = "https://snipexsol.vercel.app"; // Your website
