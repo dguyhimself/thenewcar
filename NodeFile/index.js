@@ -963,7 +963,7 @@ async function sendLicenseRequiredMessage(ctx) {
 
   *Ready to dominate the market?*
 
-  [Choose Your Plan](https://snipexsol.vercel.app/#pricing) | [Contact to Purchase](https://t.me/dguyhimself)  `;
+  [Choose Your Plan](https://snipex.wuaze.com/#pricing) | [Contact to Purchase](https://t.me/dguyhimself)  `;
   try {
     if (ctx.callbackQuery) {
       await ctx.answerCbQuery("A license is required to use this feature.", {
@@ -5101,7 +5101,7 @@ function buildAdvancedSettingsDashboard(s) {
 }
 function buildFooter() {
   const supportUser = "dguyhimself"; // Your support username
-  const websiteUrl = "https://snipexsol.vercel.app"; // Your website
+  const websiteUrl = "https://snipex.wuaze.com"; // Your website
   const botVersion = "v1.8.0"; // Optional: A version number adds professionalism
 
   const footerParts = [
